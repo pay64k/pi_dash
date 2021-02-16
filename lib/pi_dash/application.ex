@@ -15,14 +15,15 @@ defmodule PiDash.Application do
       PiDashWeb.Endpoint,
       # Start a worker by calling: PiDash.Worker.start_link(arg)
       # {PiDash.Worker, arg}
-      {Circuits.UART, name: UART},
-      UartComm,
-
+      {Circuits.UART, name: Circuits.UART},
       %{
-        id: PidSup,
-        start: {PidSup, :start_link, [["0C","0D"]]},
+        id: UartConnector,
+        start: {UartConnector, :start_link, ["/dev/pts/2"]}
+      },
+      %{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, [["0C", "0D"]]}
       }
-
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

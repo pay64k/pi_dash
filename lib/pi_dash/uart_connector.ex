@@ -1,28 +1,28 @@
-defmodule UartComm do
+defmodule UartConnector do
   use GenServer
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(serial_port) do
+    GenServer.start_link(__MODULE__, [serial_port], name: __MODULE__)
   end
 
-  def init(_) do
-    uart_comm_pid = Process.whereis(UART)
+  def init([serial_port]) do
+    uart_port_pid = Process.whereis(Circuits.UART)
 
-    :ok = Circuits.UART.open(uart_comm_pid, "/dev/pts/2", speed: 38400)
+    :ok = Circuits.UART.open(uart_port_pid, serial_port, speed: 38400)
 
-    {:ok, %{uart_comm_pid: uart_comm_pid}}
+    {:ok, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
   end
 
   def send(data) do
     GenServer.cast(__MODULE__, {:send, data})
   end
 
-  def handle_cast({:send, data}, state = %{uart_comm_pid: pid}) do
+  def handle_cast({:send, data}, state = %{uart_port_pid: pid}) do
     :ok = Circuits.UART.write(pid, data <> "\n\r")
     {:noreply, state}
   end
 
-  def handle_info({:circuits_uart, "/dev/pts/2", data}, state) do
+  def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
     data
     |> prepare_received
     |> to_binary
@@ -57,7 +57,6 @@ defmodule UartComm do
   end
 
   defp handle_data(data) do
-    # data |> IO.inspect()
-    Enum.each(PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
+    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
   end
 end

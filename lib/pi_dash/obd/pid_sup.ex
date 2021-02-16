@@ -1,4 +1,4 @@
-defmodule PidSup do
+defmodule Obd.PidSup do
   use Supervisor
 
   def start_link(obd_pids \\ []) do
@@ -24,7 +24,7 @@ defmodule PidSup do
   defp child_spec(obd_pid) do
     %{
       id: String.to_atom(obd_pid),
-      start: {PidWorker, :start_link, [obd_pid]}
+      start: {Obd.PidWorker, :start_link, [obd_pid]}
     }
   end
 
