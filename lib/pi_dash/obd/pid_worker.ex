@@ -20,7 +20,8 @@ defmodule Obd.PidWorker do
   end
 
   def handle_info(%{data: data, pid: int_obd_pid}, state = %{int_obd_pid: int_obd_pid}) do
-    IO.puts("obd worker #{int_obd_pid} recieved data: #{inspect(data)}")
+    {translated, units} = Obd.DataTranslator.handle_data(int_obd_pid, data)
+    IO.puts("obd worker #{int_obd_pid} recieved data: #{inspect(data)}, translated: #{translated} #{units}")
     {:noreply, state}
   end
 

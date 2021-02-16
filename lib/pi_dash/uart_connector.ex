@@ -38,7 +38,7 @@ defmodule UartConnector do
     |> String.replace("\r", "")
     |> String.replace(">", "")
     |> String.replace(" ", "")
-    |> IO.inspect()
+    # |> IO.inspect()
   end
 
   defp to_binary(data) do
@@ -49,7 +49,7 @@ defmodule UartConnector do
       end
 
     Base.decode16!(supl_data)
-    |> IO.inspect()
+    # |> IO.inspect()
   end
 
   defp format_data(<<_id1, _id2, _size, mode, pid, data::binary>>) do
