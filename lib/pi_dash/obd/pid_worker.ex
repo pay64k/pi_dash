@@ -1,6 +1,8 @@
 defmodule Obd.PidWorker do
   use GenServer
 
+  @obd_mode "01" # Show current data
+
   def start_link(obd_pid) do
     name = String.to_atom(obd_pid)
     {int_obd_pid, _} = Integer.parse(obd_pid, 16)
@@ -14,7 +16,7 @@ defmodule Obd.PidWorker do
 
   def handle_info(:write, state = %{obd_pid: obd_pid, tref: tref}) do
     Process.cancel_timer(tref)
-    UartConnector.send("01" <> obd_pid)
+    UartConnector.send(@obd_mode <> obd_pid)
     tref = Process.send_after(self(), :write, 1000)
     {:noreply, %{state | tref: tref}}
   end
