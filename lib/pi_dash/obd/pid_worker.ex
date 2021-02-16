@@ -23,6 +23,9 @@ defmodule Obd.PidWorker do
 
   def handle_info(%{data: data, pid: int_obd_pid}, state = %{int_obd_pid: int_obd_pid}) do
     {translated, units} = Obd.DataTranslator.handle_data(int_obd_pid, data)
+
+    msg = %{value: translated, obd_pid: int_obd_pid, units: units}
+    PiDashWeb.RoomChannel.send_to_channel(msg)
     IO.puts("obd worker #{int_obd_pid} recieved data: #{inspect(data)}, translated: #{translated} #{units}")
     {:noreply, state}
   end
