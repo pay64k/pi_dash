@@ -20,7 +20,7 @@ defmodule PiDash.Application do
       {Circuits.UART, name: Circuits.UART},
       %{
         id: UartConnector,
-        start: {UartConnector, :start_link, ["/dev/pts/2"]}
+        start: {UartConnector, :start_link, [serial_port()]}
       },
       %{
         id: Obd.PidSup,
@@ -44,6 +44,8 @@ defmodule PiDash.Application do
     PiDashWeb.Endpoint.config_change(changed, removed)
     :ok
   end
+
+  defp serial_port(), do: Application.fetch_env!(:pi_dash, :serial_port)
 
   defp pids_to_monitor() do
     [{"0C", 350}, {"0D", 1000}]

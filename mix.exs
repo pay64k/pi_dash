@@ -14,7 +14,7 @@ defmodule PiDash.MixProject do
       releases: [
         pi_dash: [
           include_executables_for: [:unix],
-          applications: [runtime_tools: :permanent],
+          applications: [pi_dash: :permanent],
           steps: [:assemble, :tar]
         ]
       ]
