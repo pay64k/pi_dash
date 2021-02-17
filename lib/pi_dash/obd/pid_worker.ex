@@ -11,6 +11,7 @@ defmodule Obd.PidWorker do
 
   def init([int_obd_pid, obd_pid]) do
     tref = Process.send_after(self(), :write, 1000)
+    # :timer.send_interval(@poll_interval, self(), :check_cluster)
     {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid, tref: tref}}
   end
 
