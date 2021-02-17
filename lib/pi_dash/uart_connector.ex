@@ -10,9 +10,9 @@ defmodule UartConnector do
   def init([serial_port]) do
     uart_port_pid = Process.whereis(Circuits.UART)
 
-    :ok = Circuits.UART.open(uart_port_pid, serial_port, speed: 38400)
+    res = open_serial(uart_port_pid, serial_port)
 
-    {:ok, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
+    {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
   end
 
   def send(data) do
@@ -67,5 +67,25 @@ defmodule UartConnector do
 
   defp handle_data(data) do
     Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
+  end
+
+  defp open_serial(uart_port_pid, serial_port) do
+    Logger.info("Attemting to connect to ELM on serial port: #{inspect(serial_port)} ...")
+    res = Circuits.UART.open(uart_port_pid, serial_port, speed: 38400)
+
+    case res do
+      :ok ->
+        Logger.info("Connected to ELM on serial port #{inspect(serial_port)}!")
+        :ok
+
+      {:error, reason} ->
+        Logger.error(
+          "Connection to ELM failed, device on #{inspect(serial_port)} serial port not found! Reason: #{
+            inspect(reason)
+          }"
+        )
+
+        :error
+    end
   end
 end
