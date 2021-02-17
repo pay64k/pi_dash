@@ -10,7 +10,12 @@ defmodule UartConnector do
   def init([serial_port]) do
     uart_port_pid = Process.whereis(Circuits.UART)
 
-    res = open_serial(uart_port_pid, serial_port)
+    res =
+      case open_serial(uart_port_pid, serial_port) do
+        :ok ->
+          Logger.info("Sedning ATZ...")
+          UartConnector.send("ATZ")
+      end
 
     {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
   end
@@ -29,7 +34,7 @@ defmodule UartConnector do
 
     cond do
       String.contains?(data, "ELM") ->
-        Logger.info("ELM connected!")
+        Logger.info("ATZ succeeded! Happy pi_dashing!")
         {:noreply, state}
 
       true ->

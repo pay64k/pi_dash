@@ -32,10 +32,7 @@ defmodule PiDash.Application do
     # for other strategies and supported options
 
     opts = [strategy: :one_for_one, name: PiDash.Supervisor]
-    res = Supervisor.start_link(children, opts)
-    Logger.info("All process started, sedning ATZ...")
-    UartConnector.send("ATZ")
-    res
+    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration
