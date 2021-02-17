@@ -3,16 +3,17 @@ defmodule Obd.PidWorker do
 
   require Logger
 
-  @obd_mode "01" # Show current data
+  # Show current data
+  @obd_mode "01"
 
-  def start_link(obd_pid) do
+  def start_link(obd_pid, interval \\ 1000) do
     name = String.to_atom(obd_pid)
     {int_obd_pid, _} = Integer.parse(obd_pid, 16)
-    GenServer.start(__MODULE__, [int_obd_pid, obd_pid], name: name)
+    GenServer.start(__MODULE__, [int_obd_pid, obd_pid, interval], name: name)
   end
 
-  def init([int_obd_pid, obd_pid]) do
-    :timer.send_interval(1000, self(), :write)
+  def init([int_obd_pid, obd_pid, interval]) do
+    :timer.send_interval(interval, self(), :write)
     {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid}}
   end
 
@@ -25,7 +26,13 @@ defmodule Obd.PidWorker do
     {translated, units} = Obd.DataTranslator.handle_data(int_obd_pid, data)
 
     msg = %{value: translated, obd_pid: int_obd_pid, units: units}
-    Logger.debug("obd pid worker #{int_obd_pid} recieved data: #{inspect(data, binaries: :as_binaries)}, translated: #{translated} #{units}")
+
+    Logger.debug(
+      "obd pid worker #{int_obd_pid} recieved data: #{inspect(data, binaries: :as_binaries)}, translated: #{
+        translated
+      } #{units}"
+    )
+
     PiDashWeb.RoomChannel.send_to_channel(msg)
     {:noreply, state}
   end

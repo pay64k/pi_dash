@@ -22,7 +22,7 @@ defmodule PiDash.Application do
       },
       %{
         id: Obd.PidSup,
-        start: {Obd.PidSup, :start_link, [["0C", "0D"]]}
+        start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
       }
     ]
 
@@ -38,5 +38,10 @@ defmodule PiDash.Application do
   def config_change(changed, _new, removed) do
     PiDashWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp pids_to_monitor() do
+    [{"0C", 350}, {"0D", 1000}]
+    |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end
 end
