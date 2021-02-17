@@ -3,6 +3,8 @@ defmodule PiDash.Application do
   # for more information on OTP Applications
   @moduledoc false
 
+  require Logger
+
   use Application
 
   def start(_type, _args) do
@@ -30,7 +32,10 @@ defmodule PiDash.Application do
     # for other strategies and supported options
 
     opts = [strategy: :one_for_one, name: PiDash.Supervisor]
-    Supervisor.start_link(children, opts)
+    res = Supervisor.start_link(children, opts)
+    Logger.info("All process started, sedning ATZ...")
+    UartConnector.send("ATZ")
+    res
   end
 
   # Tell Phoenix to update the endpoint configuration

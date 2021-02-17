@@ -12,7 +12,8 @@ defmodule Obd.PidWorker do
     GenServer.start(__MODULE__, [int_obd_pid, obd_pid, interval], name: name)
   end
 
-  def init([int_obd_pid, obd_pid, interval]) do
+  def init(opts = [int_obd_pid, obd_pid, interval]) do
+    Logger.info("Starting #{inspect __MODULE__} with opts: #{inspect opts}")
     :timer.send_interval(interval, self(), :write)
     {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid}}
   end

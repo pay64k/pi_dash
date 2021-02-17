@@ -25,14 +25,22 @@ defmodule UartConnector do
   end
 
   def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
-    Logger.debug("received on #{serial_port}: #{inspect data}")
-    data
-    |> prepare_received
-    |> to_binary
-    |> format_data
-    |> handle_data
+    Logger.debug("received on #{serial_port}: #{inspect(data)}")
 
-    {:noreply, state}
+    cond do
+      String.contains?(data, "ELM") ->
+        Logger.info("ELM connected!")
+        {:noreply, state}
+
+      true ->
+        data
+        |> prepare_received
+        |> to_binary
+        |> format_data
+        |> handle_data
+
+        {:noreply, state}
+    end
   end
 
   defp prepare_received(data) do
