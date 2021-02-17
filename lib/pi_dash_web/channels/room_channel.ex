@@ -18,7 +18,6 @@ defmodule PiDashWeb.RoomChannel do
   end
 
   def handle_info(data, socket) do
-    IO.puts "push on channel"
     push(socket, "update", data)
     {:noreply, socket}
   end

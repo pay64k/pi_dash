@@ -34,7 +34,7 @@ defmodule PiDash.MixProject do
   defp deps do
     [
       {:circuits_uart, "~> 1.4"},
-      {:exgencode, "~> 2.3"},
+      {:logger_file_backend, "~> 0.0.11"},
       {:phoenix, "~> 1.5.7"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

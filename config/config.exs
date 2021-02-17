@@ -23,6 +23,16 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :logger,
+  metadata: :all,
+  backends: [:console, {LoggerFileBackend, :logger_file_backend}]
+
+config :logger, :logger_file_backend,
+  path: "./pi_dash.log",
+  level: :debug,
+  format: "\n$date $time [$level] $metadata $message",
+  metadata: [:pid, :module, :function, :line]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

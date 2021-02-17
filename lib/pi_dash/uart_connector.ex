@@ -1,6 +1,8 @@
 defmodule UartConnector do
   use GenServer
 
+  require Logger
+
   def start_link(serial_port) do
     GenServer.start_link(__MODULE__, [serial_port], name: __MODULE__)
   end
@@ -23,6 +25,7 @@ defmodule UartConnector do
   end
 
   def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
+    Logger.debug("received on #{serial_port}: #{inspect data}")
     data
     |> prepare_received
     |> to_binary
@@ -38,7 +41,6 @@ defmodule UartConnector do
     |> String.replace("\r", "")
     |> String.replace(">", "")
     |> String.replace(" ", "")
-    # |> IO.inspect()
   end
 
   defp to_binary(data) do
@@ -49,7 +51,6 @@ defmodule UartConnector do
       end
 
     Base.decode16!(supl_data)
-    # |> IO.inspect()
   end
 
   defp format_data(<<_id1, _id2, _size, mode, pid, data::binary>>) do
