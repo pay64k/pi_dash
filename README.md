@@ -6,3 +6,5 @@ elm emulator: https://github.com/Ircama/ELM327-emulator
 switch to car, after running `elm` - `scenario car`
 
 progress bar: https://loading.io/progress/
+
+SECRET_KEY_BASE="something" MIX_ENV=prod iex -S mix phx.server
