@@ -1,8 +1,11 @@
 <section class="row">
-<div id="speed" class="ldBar" data-value="50" data-min="0" data-max="255">
-Speed
-</div>
-<div id="rpm" class="ldBar" data-value="50" data-min="0" data-max="9000">
+<div id="rpm" class="ldBar" data-value="50" data-min="0" data-max="7000" data-type="fill" data-img="images/gauge.svg" data-fill-dir="ltr">
 RPM
+</div>
+</section>
+<br><br><br><br>
+<section class="row">
+<div id="speed" class="ldBar" data-value="50" data-min="0" data-max="200" data-type="fill" data-img="images/gauge.svg" data-fill-dir="ltr">
+speed
 </div>
 </section>

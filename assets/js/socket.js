@@ -25,7 +25,7 @@ function update_bar(message) {
       break;
     case 12:
       var bar1 = document.getElementById('rpm').ldBar;
-      bar1.set(message.value);
+      bar1.set(message.value); // set second arg to false to disable animation
       break;
   }
 }

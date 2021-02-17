@@ -4,3 +4,5 @@ OBD codes: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01
 
 elm emulator: https://github.com/Ircama/ELM327-emulator
 switch to car, after running `elm` - `scenario car`
+
+progress bar: https://loading.io/progress/
