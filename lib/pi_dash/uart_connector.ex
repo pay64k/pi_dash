@@ -13,8 +13,19 @@ defmodule UartConnector do
     res =
       case open_serial(uart_port_pid, serial_port) do
         :ok ->
-          Logger.info("Sedning ATZ...")
-          UartConnector.send("ATZ")
+          init_opts = [
+            "D", # reset all to default
+            "E0", # echo off
+            "SO0", # set protocol to automatic
+            "CFC1", # flowcontrol
+            "AL", # allow long messages
+            "H1", # show headers
+            "L0", # no line feeds
+            "S0", # no whitespaces
+          ]
+          # Logger.info("Sedning ATZ...")
+          # send("AT Z")
+          :ok
       end
 
     {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
@@ -25,27 +36,44 @@ defmodule UartConnector do
   end
 
   def handle_cast({:send, data}, state = %{uart_port_pid: pid}) do
-    :ok = Circuits.UART.write(pid, data <> "\n\r")
+    to_send = data <> "\r"
+    :ok = Circuits.UART.write(pid, to_send)
     {:noreply, state}
   end
 
   def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
     Logger.debug("received on #{serial_port}: #{inspect(data)}")
+    {:noreply, state}
+    # cond do
+    #   String.contains?(data, "ELM") ->
+    #     Logger.info("ATZ succeeded! Happy pi_dashing!")
+    #     {:noreply, state}
 
-    cond do
-      String.contains?(data, "ELM") ->
-        Logger.info("ATZ succeeded! Happy pi_dashing!")
-        {:noreply, state}
+    #   String.contains?(data, "A") -> {:noreply, state}
+    #   String.contains?(data, "\r") -> {:noreply, state}
+    #   String.contains?(data, "L") -> {:noreply, state}
+    #   String.contains?(data, "T") -> {:noreply, state}
+    #   String.contains?(data, "Z") -> {:noreply, state}
+    #   String.contains?(data, "E") -> {:noreply, state}
+    #   String.contains?(data, "M") -> {:noreply, state}
+    #   String.contains?(data, "3") -> {:noreply, state}
+    #   String.contains?(data, "2") -> {:noreply, state}
+    #   String.contains?(data, "7") -> {:noreply, state}
+    #   String.contains?(data, " ") -> {:noreply, state}
+    #   String.contains?(data, "v") -> {:noreply, state}
+    #   String.contains?(data, "1") -> {:noreply, state}
+    #   String.contains?(data, ".") -> {:noreply, state}
+    #   String.contains?(data, "5") -> {:noreply, state}
 
-      true ->
-        data
-        |> prepare_received
-        |> to_binary
-        |> format_data
-        |> handle_data
+    #   true ->
+    #     data
+    #     |> prepare_received
+    #     |> to_binary
+    #     |> format_data
+    #     |> handle_data
 
-        {:noreply, state}
-    end
+    #     {:noreply, state}
+    # end
   end
 
   defp prepare_received(data) do
@@ -76,7 +104,16 @@ defmodule UartConnector do
 
   defp open_serial(uart_port_pid, serial_port) do
     Logger.info("Attemting to connect to ELM on serial port: #{inspect(serial_port)} ...")
-    res = Circuits.UART.open(uart_port_pid, serial_port, speed: 38400)
+
+    opts = [
+      speed: 3800,
+      data_bits: 8,
+      parity: :none,
+      stop_bits: 1,
+      framing: {Circuits.UART.Framing.Line, separator: "\r"}
+    ]
+
+    res = Circuits.UART.open(uart_port_pid, serial_port, opts)
 
     case res do
       :ok ->

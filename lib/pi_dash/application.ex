@@ -22,10 +22,11 @@ defmodule PiDash.Application do
         id: UartConnector,
         start: {UartConnector, :start_link, [serial_port()]}
       },
-      %{
-        id: Obd.PidSup,
-        start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
-      }
+      # %{
+      #   id: Obd.PidSup,
+      #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
+      # }
+
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -45,7 +46,7 @@ defmodule PiDash.Application do
   defp serial_port(), do: Application.fetch_env!(:pi_dash, :serial_port)
 
   defp pids_to_monitor() do
-    [{"0C", 350}, {"0D", 1000}]
+    [{"0D", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end
 end
