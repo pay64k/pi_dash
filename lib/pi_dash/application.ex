@@ -20,18 +20,17 @@ defmodule PiDash.Application do
       %{
         id: ElmConnector,
         start: {ElmConnector, :start_link, [serial_port()]}
+      },
+      %{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
       }
-      # %{
-      #   id: Obd.PidSup,
-      #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
-      # }
-
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
 
-    opts = [strategy: :one_for_one, name: PiDash.Supervisor, max_restarts: 1]
+    opts = [strategy: :one_for_one, name: PiDash.Supervisor, max_restarts: 0]
     Supervisor.start_link(children, opts)
   end
 
@@ -45,7 +44,7 @@ defmodule PiDash.Application do
   defp serial_port(), do: Application.fetch_env!(:pi_dash, :serial_port)
 
   defp pids_to_monitor() do
-    [{"0D", 1000}]
+    [{"0C", 350}, {"0D", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end
 end

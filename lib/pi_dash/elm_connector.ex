@@ -9,6 +9,7 @@ defmodule ElmConnector do
 
   def init([serial_port]) do
     {:ok, uart_port_pid} = Circuits.UART.start_link()
+
     res =
       case open_serial(uart_port_pid, serial_port) do
         :ok ->
@@ -24,18 +25,20 @@ defmodule ElmConnector do
             "DPN", # Describe the Protocol by Number
             "0100" # PIDs supported [01 - 20]
           ]
-          Logger.info("Setting up ELM with commands: #{inspect elm_opts}")
+
+          Logger.info("Setting up ELM with commands: #{inspect(elm_opts)}")
           Enum.each(elm_opts, fn command -> send({:at, command}) end)
-          # send_to_workers(:start)
           :ok
       end
 
+    :timer.send_after(5000, self() , :start_workers)
     {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
   end
 
   def send({:at, data = "0100"}) do
     GenServer.cast(__MODULE__, {:send, data})
   end
+
   def send({:at, data}) do
     GenServer.cast(__MODULE__, {:send, "AT" <> data})
   end
@@ -45,44 +48,64 @@ defmodule ElmConnector do
   end
 
   def handle_cast({:send, data}, state = %{uart_port_pid: pid}) do
-    Logger.info("Sending #{inspect data}")
+    Logger.info("Sending #{inspect(data)}")
     :ok = Circuits.UART.write(pid, data)
     {:noreply, state}
   end
 
-  def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
-    Logger.debug("received on #{serial_port}: #{inspect(data)}")
-    handle_data(data)
+  def handle_info(:start_workers, state) do
+    send_to_workers(:start)
     {:noreply, state}
-    # cond do
-    #   String.contains?(data, "ELM") ->
-    #     Logger.info("ATZ succeeded! Happy pi_dashing!")
-    #     {:noreply, state}
-
-    #   true ->
-    #     data
-    #     |> prepare_received
-    #     |> to_binary
-    #     |> format_data
-    #     |> propagate_data
-
-    #     {:noreply, state}
-    # end
   end
 
-  def handle_data(""), do: :ok
-  def handle_data(">"), do: :ok
-  def handle_data(">OK"), do: :ok
-  def handle_data("?"), do: :ok
-  def handle_data(">?"), do: :ok
-  def handle_data("ELM327 v1.5"), do: :ok
-  def handle_data(data) do
-    data
-    |> prepare_received
-    |> to_binary
-    |> format_data
-    |> send_to_workers
+  def handle_info({:circuits_uart, serial_port, ""}, state = %{serial_port: serial_port}) do
+    {:noreply, state}
   end
+  def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
+    Logger.debug("received on #{serial_port}: clean: #{inspect prepare_received(data)} , raw: #{inspect(data)}")
+
+    clean_data = prepare_received(data)
+    # data
+    # |> prepare_received
+    # |> handle_data
+
+    # {:noreply, state}
+    cond do
+      String.starts_with?(clean_data, "AT") or
+      String.contains?(clean_data, "OK") or
+      String.contains?(clean_data, "ELM") or
+      String.contains?(clean_data, "TDPN") or
+      String.contains?(clean_data, "SEARCHING...") or
+      String.equivalent?(clean_data, "A") or
+      String.equivalent?(clean_data, "A0") or
+      String.equivalent?(clean_data, "0100") or
+      String.contains?(clean_data, "486B104100BE3EB811C9") ->
+        {:noreply, state}
+
+      true ->
+        clean_data
+        # |> prepare_received
+        |> to_binary
+        |> format_data
+        |> send_to_workers
+
+        {:noreply, state}
+    end
+  end
+
+  # def handle_data(">OK"), do: :ok
+  # def handle_data("A0"), do: :ok
+  # def handle_data("SEARCHING..."), do: :ok
+  # def handle_data("ELM327 v1.5"), do: :ok
+  # def handle_data(_), do: :ok
+
+  # def handle_data(data) do
+  #   data
+  #   |> prepare_received
+  #   |> to_binary
+  #   |> format_data
+  #   |> send_to_workers
+  # end
 
   defp prepare_received(data) do
     data
@@ -102,10 +125,12 @@ defmodule ElmConnector do
   defp format_data(<<_id1, _id2, _size, mode, pid, data::binary>>) do
     %{mode: mode, pid: pid, data: data}
   end
+
   defp format_data(<<_id1, _id2, mode, pid, data::binary>>) do
     %{mode: mode, pid: pid, data: data}
   end
 
+  # TODO: send only to the one with matching pid
   defp send_to_workers(data) do
     Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
   end

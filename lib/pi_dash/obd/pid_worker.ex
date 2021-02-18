@@ -13,13 +13,15 @@ defmodule Obd.PidWorker do
   end
 
   def init(opts = [int_obd_pid, obd_pid, interval]) do
-    Logger.info("Starting #{inspect __MODULE__} with opts: #{inspect opts}")
-    {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid, interval: interval, tref: nil}}
+    Logger.info("Starting #{inspect(__MODULE__)} with opts: #{inspect(opts)}")
+    # {:ok, tref} = :timer.send_interval(interval, self(), :write)
+    {:ok,
+     %{int_obd_pid: int_obd_pid, obd_pid: obd_pid, interval: interval, tref: nil, last_value: 0}}
   end
 
   def handle_info(:start, state = %{interval: interval}) do
     {:ok, tref} = :timer.send_interval(interval, self(), :write)
-    {:ok, %{state | tref: tref}}
+    {:noreply, %{state | tref: tref}}
   end
 
   def handle_info(:write, state = %{obd_pid: obd_pid}) do
@@ -27,19 +29,27 @@ defmodule Obd.PidWorker do
     {:noreply, state}
   end
 
-  def handle_info(%{data: data, pid: int_obd_pid}, state = %{int_obd_pid: int_obd_pid}) do
-    {translated, units} = Obd.DataTranslator.handle_data(int_obd_pid, data)
-
-    msg = %{value: translated, obd_pid: int_obd_pid, units: units}
-
+  def handle_info(
+        %{data: data, pid: int_obd_pid},
+        state = %{int_obd_pid: int_obd_pid, last_value: last_value}
+      ) do
     Logger.debug(
-      "obd pid worker #{int_obd_pid} recieved data: #{inspect(data, binaries: :as_binaries)}, translated: #{
-        translated
-      } #{units}"
+      "obd pid worker #{int_obd_pid} recieved data: #{inspect(data, binaries: :as_binaries)}"
     )
 
-    PiDashWeb.RoomChannel.send_to_channel(msg)
-    {:noreply, state}
+    case Obd.DataTranslator.handle_data(int_obd_pid, data) do
+      {:error, reason} ->
+        Logger.warning("could not translate: #{inspect(data, binaries: :as_binaries)}, reason: #{inspect reason}")
+        msg = %{value: last_value, obd_pid: int_obd_pid, units: nil}
+        PiDashWeb.RoomChannel.send_to_channel(msg)
+        {:noreply, state}
+
+      {value, units} ->
+        Logger.debug("obd pid worker #{int_obd_pid} translated data: #{inspect(value)} #{units}")
+        msg = %{value: value, obd_pid: int_obd_pid, units: units}
+        PiDashWeb.RoomChannel.send_to_channel(msg)
+        {:noreply, %{state | last_value: value}}
+    end
   end
 
   def handle_info(_data, state) do
