@@ -13,8 +13,9 @@ defmodule UartConnector do
     res =
       case open_serial(uart_port_pid, serial_port) do
         :ok ->
-          init_opts = [
-            "D", # reset all to default
+          elm_opts = [
+            "Z", # reset all
+            "D", # set all to default
             "E0", # echo off
             "SO0", # set protocol to automatic
             "CFC1", # flowcontrol
@@ -23,12 +24,16 @@ defmodule UartConnector do
             "L0", # no line feeds
             "S0", # no whitespaces
           ]
-          # Logger.info("Sedning ATZ...")
-          # send("AT Z")
+          Logger.info("Setting up ELM with commands: #{inspect elm_opts}")
+          Enum.each(elm_opts, fn command -> send({:at, command}) end)
           :ok
       end
 
     {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
+  end
+
+  def send({:at, data}) do
+    GenServer.cast(__MODULE__, {:send, "AT" <> data})
   end
 
   def send(data) do
@@ -36,13 +41,13 @@ defmodule UartConnector do
   end
 
   def handle_cast({:send, data}, state = %{uart_port_pid: pid}) do
-    to_send = data <> "\r"
-    :ok = Circuits.UART.write(pid, to_send)
+    :ok = Circuits.UART.write(pid, data)
     {:noreply, state}
   end
 
   def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
     Logger.debug("received on #{serial_port}: #{inspect(data)}")
+    handle_data(data)
     {:noreply, state}
     # cond do
     #   String.contains?(data, "ELM") ->
@@ -70,10 +75,14 @@ defmodule UartConnector do
     #     |> prepare_received
     #     |> to_binary
     #     |> format_data
-    #     |> handle_data
+    #     |> propagate_data
 
     #     {:noreply, state}
     # end
+  end
+
+  def handle_data(data) do
+    :ok
   end
 
   defp prepare_received(data) do
@@ -98,7 +107,7 @@ defmodule UartConnector do
     %{mode: mode, pid: pid, data: data}
   end
 
-  defp handle_data(data) do
+  defp propagate_data(data) do
     Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
   end
 
