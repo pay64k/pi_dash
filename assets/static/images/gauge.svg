@@ -1,47 +1,32 @@
-<svg width="700" height="50" xmlns="http://www.w3.org/2000/svg">
-
+<svg width="1114" height="52" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet">
+ <defs>
+  <linearGradient gradientTransform="rotate(0) scale(1 1)" y2="0%" y1="0%" x2="100%" x1="0%" spreadMethod="pad" id="gradient1" gradientUnits="objectBoundingBox">
+   <stop stop-color=" rgb(0, 0, 0)" offset="0.06364"/>
+   <stop stop-color=" rgb(255, 255, 0)" offset="0.63636"/>
+   <stop stop-color="rgb(255,0,0)" offset="0.84727"/>
+  </linearGradient>
+  <pattern height="3.5" width="69.76" y="0" x="0" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" viewBox="78.45232391357422 149.68087768554688 1116.1400146484375 55.957298278808594" id="pattern2">
+   <rect id="svg_1" stroke=" none" fill="url(#pattern1)" height="55.9573" width="1116.14001" y="149.68088" x="78.45232"/>
+  </pattern>
+  <pattern height="3.5" width="69.96" y="0" x="0" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" viewBox="0 0 1119.3299560546875 55.95736312866211" id="pattern3">
+   <rect id="svg_2" stroke=" none" fill="url(#gradient1)" transform="matrix(1,0,0,1,-68.8827,-36.972) " height="55.9573" width="1116.14001" y="36.97201" x="68.88268"/>
+   <rect id="svg_3" stroke=" none" fill="url(#pattern1)" transform="matrix(1,0,0,1,-68.8827,-36.972) " height="55.9573" width="1116.14001" y="36.97208" x="72.07258"/>
+  </pattern>
+  <pattern height="3.5" width="69.76" y="0" x="0" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" viewBox="3.1899032592773438 0.000064849853515625 1116.1400146484375 55.957298278808594" id="pattern4">
+   <rect id="svg_4" stroke=" none" fill="url(#pattern1)" transform="matrix(1,0,0,1,-68.8827,-36.972) " height="55.9573" width="1116.14001" y="36.97208" x="72.07258"/>
+  </pattern>
+  <pattern y="0" x="0" width="10" viewBox="0 0 10 10" patternUnits="userSpaceOnUse" patternTransform="rotate(90) scale(1 1)" id="pattern1" height="30">
+   <line id="svg_5" stroke=" white" y2="5" y1="5" x2="10" x1="0"/>
+  </pattern>
+ </defs>
  <g>
   <title>background</title>
-  <rect fill="none" id="canvas_background" height="602" width="802" y="-1" x="-1"/>
+  <rect fill="none" id="canvas_background" height="842" width="1302" y="-1" x="-1"/>
  </g>
  <g>
   <title>Layer 1</title>
-  <rect id="svg_1" height="49" width="713" y="-1" x="26" opacity="undefined" stroke="#000" fill="#fff"/>
-  <rect id="svg_3" height="49" width="80" y="-1" x="616.5" opacity="NaN" fill-opacity="null" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" stroke="#000" fill="#ff0000"/>
-  <rect stroke="#000" id="svg_4" height="49" width="33" y="-1" x="581.27532" opacity="NaN" fill-opacity="null" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#ff0000"/>
-  <rect stroke="#000" id="svg_5" height="49" width="30" y="-1" x="549.22131" opacity="NaN" fill-opacity="null" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#ff0000"/>
-  <rect stroke="#000" id="svg_6" height="49" width="30" y="-1" x="517.08522" opacity="NaN" fill-opacity="null" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#ff0000"/>
-  <rect stroke="#000" id="svg_7" height="49" width="30" y="-1" x="484.94491" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_8" height="49" width="30" y="-1" x="452.88247" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_9" height="49" width="30" y="-1" x="420.93722" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_10" height="49" width="30" y="-1" x="388.87478" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_11" height="49" width="30" y="-1" x="355.75364" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_12" height="49" width="30" y="-1" x="323.6912" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_13" height="49" width="30" y="-1" x="291.74595" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_14" height="49" width="30" y="-1" x="259.68351" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_15" height="49" width="30" y="-1" x="484.94491" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_16" height="49" width="30" y="-1" x="452.88247" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_17" height="49" width="30" y="-1" x="420.93722" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_18" height="49" width="30" y="-1" x="388.87478" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_19" height="49" width="30" y="-1" x="355.75364" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_20" height="49" width="30" y="-1" x="323.6912" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_21" height="49" width="30" y="-1" x="291.74595" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_22" height="49" width="30" y="-1" x="259.68351" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_23" height="49" width="30" y="-1" x="226.94296" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_24" height="49" width="30" y="-1" x="194.88052" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_25" height="49" width="30" y="-1" x="162.93527" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_26" height="49" width="30" y="-1" x="130.87283" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_27" height="49" width="30" y="-1" x="97.75169" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_28" height="49" width="30" y="-1" x="65.68925" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_29" height="49" width="30" y="-1" x="33.744" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_30" height="49" width="30" y="-1" x="1.68156" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_31" height="49" width="30" y="-1" x="226.94296" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_32" height="49" width="30" y="-1" x="194.88052" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_33" height="49" width="30" y="-1" x="162.93527" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_34" height="49" width="30" y="-1" x="130.87283" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_35" height="49" width="30" y="-1" x="97.75169" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_36" height="49" width="30" y="-1" x="65.68925" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_37" height="49" width="30" y="-1" x="33.744" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
-  <rect stroke="#000" id="svg_38" height="49" width="30" y="-1" x="1.68156" opacity="NaN" stroke-opacity="null" stroke-dasharray="null" stroke-width="0" fill="#000000"/>
+  <rect fill="none" height="840" width="1300" y="0" x="0" id="svgEditorBackground"/>
+  <rect stroke=" none" fill="url(#gradient1)" transform="matrix(1 0 0 1 -68.8827 -36.972)" height="55.9573" width="1116.14001" id="e2_rectangle" y="36.97201" x="68.88268"/>
+  <rect stroke=" none" fill="url(#pattern1)" transform="matrix(1 0 0 1 -68.8827 -36.972)" height="55.9573" width="1116.14001" id="e1_rectangle" y="36.97208" x="80.57891"/>
  </g>
 </svg>

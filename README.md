@@ -7,4 +7,5 @@ switch to car, after running `elm` - `scenario car`
 
 progress bar: https://loading.io/progress/
 
-SECRET_KEY_BASE="something" MIX_ENV=prod iex -S mix phx.server
+draw here: https://www.drawsvg.org/drawsvg.html and convert here: https://editor.method.ac/
+
