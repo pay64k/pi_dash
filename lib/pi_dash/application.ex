@@ -17,11 +17,10 @@ defmodule PiDash.Application do
       PiDashWeb.Endpoint,
       # Start a worker by calling: PiDash.Worker.start_link(arg)
       # {PiDash.Worker, arg}
-      {Circuits.UART, name: Circuits.UART},
       %{
-        id: UartConnector,
-        start: {UartConnector, :start_link, [serial_port()]}
-      },
+        id: ElmConnector,
+        start: {ElmConnector, :start_link, [serial_port()]}
+      }
       # %{
       #   id: Obd.PidSup,
       #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
@@ -32,7 +31,7 @@ defmodule PiDash.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
 
-    opts = [strategy: :one_for_one, name: PiDash.Supervisor]
+    opts = [strategy: :one_for_one, name: PiDash.Supervisor, max_restarts: 1]
     Supervisor.start_link(children, opts)
   end
 

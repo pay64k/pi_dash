@@ -14,12 +14,16 @@ defmodule Obd.PidWorker do
 
   def init(opts = [int_obd_pid, obd_pid, interval]) do
     Logger.info("Starting #{inspect __MODULE__} with opts: #{inspect opts}")
-    :timer.send_interval(interval, self(), :write)
-    {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid}}
+    {:ok, %{int_obd_pid: int_obd_pid, obd_pid: obd_pid, interval: interval, tref: nil}}
+  end
+
+  def handle_info(:start, state = %{interval: interval}) do
+    {:ok, tref} = :timer.send_interval(interval, self(), :write)
+    {:ok, %{state | tref: tref}}
   end
 
   def handle_info(:write, state = %{obd_pid: obd_pid}) do
-    UartConnector.send(@obd_mode <> obd_pid)
+    ElmConnector.send(@obd_mode <> obd_pid)
     {:noreply, state}
   end
 
