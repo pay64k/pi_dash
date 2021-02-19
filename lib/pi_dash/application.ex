@@ -18,13 +18,13 @@ defmodule PiDash.Application do
       # Start a worker by calling: PiDash.Worker.start_link(arg)
       # {PiDash.Worker, arg}
       %{
-        id: ElmConnector,
-        start: {ElmConnector, :start_link, [serial_port()]}
+        id: ElmConnectorStatem,
+        start: {ElmConnectorStatem, :start_link, [serial_port()]}
       },
-      %{
-        id: Obd.PidSup,
-        start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
-      }
+      # %{
+      #   id: Obd.PidSup,
+      #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
+      # }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
