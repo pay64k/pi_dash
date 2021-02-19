@@ -42,6 +42,7 @@ defmodule PiDash.MixProject do
     [
       {:circuits_uart, "~> 1.4"},
       {:logger_file_backend, "~> 0.0.11"},
+      {:gen_state_machine, "~> 3.0"},
       {:phoenix, "~> 1.5.7"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
