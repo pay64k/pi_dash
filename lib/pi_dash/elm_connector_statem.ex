@@ -84,6 +84,7 @@ defmodule ElmConnectorStatem do
         {:next_state, :connected, data}
 
       :error ->
+        Process.sleep(5000)
         GenStateMachine.cast(__MODULE__, :open_connection)
         :keep_state_and_data
     end
