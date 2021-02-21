@@ -23,3 +23,6 @@ elm commands: https://www.elmelectronics.com/wp-content/uploads/2016/07/ELM327DS
   }
 }
 
+https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408
+
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
