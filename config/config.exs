@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :pi_dash,
- serial_port: "/dev/tty.usbserial-1420"
+  serial_port: "/dev/tty.usbserial-1420"
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,
@@ -28,6 +28,5 @@ config :logger, :logger_file_backend,
   level: :debug,
   format: "\n$date $time [$level] $metadata $message",
   metadata: [:pid, :module, :function, :line]
-
 
 import_config "#{Mix.env()}.exs"

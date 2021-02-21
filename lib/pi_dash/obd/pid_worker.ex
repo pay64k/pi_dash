@@ -39,7 +39,12 @@ defmodule Obd.PidWorker do
 
     case Obd.DataTranslator.handle_data(int_obd_pid, data) do
       {:error, reason} ->
-        Logger.warn("could not translate: #{inspect(data, binaries: :as_binaries)}, reason: #{inspect reason}")
+        Logger.warn(
+          "could not translate: #{inspect(data, binaries: :as_binaries)}, reason: #{
+            inspect(reason)
+          }"
+        )
+
         msg = %{value: last_value, obd_pid: int_obd_pid, units: nil}
         PiDashWeb.RoomChannel.send_to_channel(msg)
         {:noreply, state}

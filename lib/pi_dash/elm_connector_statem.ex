@@ -101,7 +101,11 @@ defmodule ElmConnectorStatem do
       active: true
     ]
 
-    Logger.info("Attemting to connect to ELM on serial port: #{inspect(serial_port)} with opts: #{inspect opts}")
+    Logger.info(
+      "Attemting to connect to ELM on serial port: #{inspect(serial_port)} with opts: #{
+        inspect(opts)
+      }"
+    )
 
     res = Circuits.UART.open(uart_port_pid, serial_port, opts)
 

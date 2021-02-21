@@ -2,11 +2,11 @@ defmodule Obd.DataTranslator do
   require Logger
   # rpm
   def handle_data(12, <<a, b, _>>) do
-    {(256 * a + b)/4, "RPM"}
+    {(256 * a + b) / 4, "RPM"}
   end
 
-  def handle_data(12, <<a, b,>>) do
-    {(256 * a + b)/4, "RPM"}
+  def handle_data(12, <<a, b>>) do
+    {(256 * a + b) / 4, "RPM"}
   end
 
   def handle_data(12, <<_a>>) do
@@ -21,5 +21,4 @@ defmodule Obd.DataTranslator do
   def handle_data(_obd_pid, _data) do
     {:error, :unhandled}
   end
-
 end

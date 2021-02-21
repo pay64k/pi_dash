@@ -14,16 +14,26 @@ defmodule ElmConnector do
       case open_serial(uart_port_pid, serial_port) do
         :ok ->
           elm_opts = [
-            "Z", # reset all
-            "E0", # echo off
-            "SP0", # set protocol to automatic
-            "CFC1", # flowcontrol
-            "AL", # allow long messages
-            "H1", # show headers
-            "L0", # no line feeds
-            "S0", # no whitespaces
-            "DPN", # Describe the Protocol by Number
-            "0100" # PIDs supported [01 - 20]
+            # reset all
+            "Z",
+            # echo off
+            "E0",
+            # set protocol to automatic
+            "SP0",
+            # flowcontrol
+            "CFC1",
+            # allow long messages
+            "AL",
+            # show headers
+            "H1",
+            # no line feeds
+            "L0",
+            # no whitespaces
+            "S0",
+            # Describe the Protocol by Number
+            "DPN",
+            # PIDs supported [01 - 20]
+            "0100"
           ]
 
           Logger.info("Setting up ELM with commands: #{inspect(elm_opts)}")
@@ -31,7 +41,7 @@ defmodule ElmConnector do
           :ok
       end
 
-    :timer.send_after(5000, self() , :start_workers)
+    :timer.send_after(5000, self(), :start_workers)
     {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
   end
 
@@ -61,8 +71,13 @@ defmodule ElmConnector do
   def handle_info({:circuits_uart, serial_port, ""}, state = %{serial_port: serial_port}) do
     {:noreply, state}
   end
+
   def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
-    Logger.debug("received on #{serial_port}: clean: #{inspect prepare_received(data)} , raw: #{inspect(data)}")
+    Logger.debug(
+      "received on #{serial_port}: clean: #{inspect(prepare_received(data))} , raw: #{
+        inspect(data)
+      }"
+    )
 
     clean_data = prepare_received(data)
     # data
@@ -72,14 +87,14 @@ defmodule ElmConnector do
     # {:noreply, state}
     cond do
       String.starts_with?(clean_data, "AT") or
-      String.contains?(clean_data, "OK") or
-      String.contains?(clean_data, "ELM") or
-      String.contains?(clean_data, "TDPN") or
-      String.contains?(clean_data, "SEARCHING...") or
-      String.equivalent?(clean_data, "A") or
-      String.equivalent?(clean_data, "A0") or
-      String.equivalent?(clean_data, "0100") or
-      String.contains?(clean_data, "486B104100BE3EB811C9") ->
+        String.contains?(clean_data, "OK") or
+        String.contains?(clean_data, "ELM") or
+        String.contains?(clean_data, "TDPN") or
+        String.contains?(clean_data, "SEARCHING...") or
+        String.equivalent?(clean_data, "A") or
+        String.equivalent?(clean_data, "A0") or
+        String.equivalent?(clean_data, "0100") or
+          String.contains?(clean_data, "486B104100BE3EB811C9") ->
         {:noreply, state}
 
       true ->

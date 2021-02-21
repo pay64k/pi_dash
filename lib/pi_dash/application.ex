@@ -20,7 +20,8 @@ defmodule PiDash.Application do
       %{
         id: ElmConnectorStatem,
         start: {ElmConnectorStatem, :start_link, [serial_port()]}
-      },
+      }
+      #TODO start pid sup after configuration of elm
       # %{
       #   id: Obd.PidSup,
       #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
