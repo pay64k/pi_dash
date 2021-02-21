@@ -43,6 +43,7 @@ defmodule PiDash.Application do
 
   defp serial_port(), do: Application.fetch_env!(:pi_dash, :serial_port)
 
+  # TODO: read all setting from property file, in env.sh point to location of the file
   defp pids_to_monitor() do
     [{"0C", 350}, {"0D", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
