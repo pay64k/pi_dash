@@ -1,3 +1,5 @@
+[![build](https://github.com/pay64k/pi_dash/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pay64k/pi_dash/actions/workflows/build.yml)
+
 https://www.csselectronics.com/screen/page/simple-intro-obd2-explained/language/en, "Raw OBD2 frame details" chapter
 
 OBD codes: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01
