@@ -11,6 +11,12 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
+      
       - name: build
-        run: |
-          make
+        run:  make
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pi_dash.tar.gz
+          path: _build/prod/pi_dash-0.1.0.tar.gz
