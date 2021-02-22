@@ -21,7 +21,7 @@ defmodule PiDash.Application do
         id: ElmConnectorStatem,
         start: {ElmConnectorStatem, :start_link, [serial_port()]}
       }
-      #TODO start pid sup after configuration of elm
+      # TODO start pid sup after configuration of elm
       # %{
       #   id: Obd.PidSup,
       #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
@@ -42,11 +42,25 @@ defmodule PiDash.Application do
     :ok
   end
 
-  defp serial_port(), do: Application.fetch_env!(:pi_dash, :serial_port)
-
   # TODO: read all setting from property file, in env.sh point to location of the file
   defp pids_to_monitor() do
     [{"0C", 350}, {"0D", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
+  end
+
+  defp serial_port() do
+    case find_serial_port() do
+      nil -> Application.fetch_env!(:pi_dash, :serial_port)
+      {name, _info} -> name
+    end
+  end
+
+  defp find_serial_port() do
+    Circuits.UART.enumerate()
+    |> Enum.filter(fn {_, m} ->
+      :manufacturer in Map.keys(m) and
+        String.contains?(m.manufacturer, "Prolific")
+    end)
+    |> List.first()
   end
 end
