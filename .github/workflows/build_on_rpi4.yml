@@ -1,0 +1,17 @@
+# This is a basic workflow to help you get started with Actions
+
+name: build_on_rpi4
+
+on:
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run a one-line script
+        run: make
