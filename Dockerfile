@@ -1,12 +1,12 @@
 # https://kaiwern.com/posts/2020/06/20/building-elixir/phoenix-release-with-docker/
+# TODO: add version script from the aboe page
 ARG base_image
 
 FROM $base_image as build
-RUN apk update && apk add build-base make nodejs npm python3
-
-RUN apk update && apk add erlang erlang-dev elixir
-
-RUN apk add linux-headers --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main
+RUN apk --no-cache update
+RUN apk --no-cache add build-base make nodejs npm python3
+RUN apk --no-cache add linux-headers --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main
+RUN apk --no-cache add erlang erlang-dev elixir
 
 WORKDIR /app
 RUN mix local.hex --force && \

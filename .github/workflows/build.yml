@@ -8,15 +8,18 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
       - name: build
-        run:  make
+        run:  make docker_rpi4
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: pi_dash.tar.gz
-          path: _build/prod/pi_dash-0.1.0.tar.gz
+          name: pi_dash-0.1.0-arm64v8.tar.gz
+          path: pi_dash-0.1.0-arm64v8.tar.gz

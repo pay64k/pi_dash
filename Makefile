@@ -1,4 +1,3 @@
-export base_image_rpi_b_plus=docker.io/arm32v6/alpine:3.13.2
 export base_image_rpi4=docker.io/arm64v8/alpine:3.13.2
 
 export DOCKER_USER=pay64k
@@ -16,17 +15,11 @@ docker_rpi4:
 	docker buildx build --build-arg base_image=${base_image_rpi4} --platform linux/arm64 --push . -t "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
 	docker buildx imagetools inspect "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
 	docker inspect --format "{{.Architecture}}" "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
-
-.PHONY: docker_rpi_b_plus
-docker_rpi_b_plus:
-	docker buildx build --build-arg base_image=${base_image_rpi_b_plus} --platform linux/arm64 --push . -t "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
-	docker buildx imagetools inspect "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
-	docker inspect --format "{{.Architecture}}" "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
 	# extract release
-	docker create --name boii "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
+	docker create --name boii "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
 	docker cp boii:/app/pi_dash-0.1.0.tar.gz .
 	docker rm boii
-	mv pi_dash-0.1.0.tar.gz pi_dash-0.1.0-arm32v6.tar.gz
+	mv pi_dash-0.1.0.tar.gz pi_dash-0.1.0-arm64v8.tar.gz
 
 .PHONY: configure
 configure:
