@@ -22,10 +22,11 @@ docker_rpi_b_plus:
 	docker buildx build --build-arg base_image=${base_image_rpi_b_plus} --platform linux/arm64 --push . -t "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
 	docker buildx imagetools inspect "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
 	docker inspect --format "{{.Architecture}}" "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
-
-.PHONY: run_docker
-run_docker:
-	docker run -it --rm "${DOCKER_USER}/pi_dash:arm64"
+	# extract release
+	docker create --name boii "docker.io/${DOCKER_USER}/pi_dash:arm32v6"
+	docker cp boii:/app/pi_dash-0.1.0.tar.gz .
+	docker rm boii
+	mv pi_dash-0.1.0.tar.gz pi_dash-0.1.0-arm32v6.tar.gz
 
 .PHONY: configure
 configure:
