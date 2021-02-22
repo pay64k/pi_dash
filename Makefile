@@ -13,8 +13,8 @@ release:
 .PHONY: docker_rpi4
 docker_rpi4:
 	docker buildx build --build-arg base_image=${base_image_rpi4} --platform linux/arm64 --push . -t "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
-	docker buildx imagetools inspect "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
-	docker inspect --format "{{.Architecture}}" "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
+	# docker buildx imagetools inspect "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
+	# docker inspect --format "{{.Architecture}}" "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
 	# extract release
 	docker create --name boii "docker.io/${DOCKER_USER}/pi_dash:arm64v8"
 	docker cp boii:/app/pi_dash-0.1.0.tar.gz .
