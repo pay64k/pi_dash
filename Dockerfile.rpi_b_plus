@@ -1,0 +1,11 @@
+FROM docker.io/arm32v6/rabbitmq:alpine
+RUN apk update && apk add build-base erlang-dev elixir nodejs npm python2
+RUN mkdir /build
+WORKDIR /build
+COPY . .
+RUN rm -rf assets/node_modules/
+RUN mix local.hex --force && mix local.rebar --force
+RUN MIX_ENV=prod mix deps.get
+RUN npm install --prefix ./assets
+RUN npm run deploy --prefix ./assets
+RUN MIX_ENV=prod mix release pi_dash
