@@ -25,7 +25,7 @@ defmodule Obd.PidWorker do
   end
 
   def handle_info(:write, state = %{obd_pid: obd_pid}) do
-    ElmConnector.send(@obd_mode <> obd_pid)
+    Elm.Connector.send(@obd_mode <> obd_pid)
     {:noreply, state}
   end
 

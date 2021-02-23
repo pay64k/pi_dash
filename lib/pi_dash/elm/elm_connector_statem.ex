@@ -7,7 +7,7 @@ defmodule Elm.Data do
   ]
 end
 
-defmodule ElmConnectorStatem do
+defmodule Elm.ConnectorStatem do
   use GenStateMachine
   alias Elm.Data
   require Logger
@@ -56,23 +56,13 @@ defmodule ElmConnectorStatem do
     :keep_state_and_data
   end
 
-  def handle_event(:info, {:circuits_uart, port, msg}, :connected, data = %Data{port: port}) do
-    Logger.debug("received on #{port}: #{inspect(msg)}")
-
-    cond do
-      String.contains?(msg, "Z") ->
-        :keep_state_and_data
-
-      String.contains?(msg, "ELM") ->
-        {:next_state, :connected, %Data{data | elm_version: msg}}
-
-      true ->
-        :keep_state_and_date
-    end
+  def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
+    Logger.debug("Received from ELM: #{inspect(msg)}, state: #{inspect state}")
+    handle_msg(msg, state, data)
   end
 
   def handle_event(:cast, {:write, msg}, state, data) do
-    Logger.info("State: #{state}, write #{inspect(msg)}")
+    Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect state}")
     :ok = Circuits.UART.write(data.uart_port_pid, msg)
     :keep_state_and_data
   end
@@ -81,12 +71,26 @@ defmodule ElmConnectorStatem do
     case open_serial(data.uart_port_pid, data.port) do
       :ok ->
         write_at_command("Z")
-        {:next_state, :connected, data}
+        {:next_state, :configuring , data}
 
       :error ->
         Process.sleep(5000)
         GenStateMachine.cast(__MODULE__, :open_connection)
         :keep_state_and_data
+    end
+  end
+
+  defp handle_msg(msg, :configuring, data) do
+    cond do
+      String.contains?(msg, "Z") ->
+        :keep_state_and_data
+
+      String.contains?(msg, "ELM") ->
+        Logger.info("Connected ELM version: #{msg}")
+        {:next_state, :configuring, %Data{data | elm_version: msg}}
+
+      true ->
+        :keep_state_and_date
     end
   end
 

@@ -1,4 +1,4 @@
-defmodule ElmConnector do
+defmodule Elm.Connector do
   use GenServer
 
   require Logger

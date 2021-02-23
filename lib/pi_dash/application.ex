@@ -8,6 +8,7 @@ defmodule PiDash.Application do
   use Application
 
   def start(_type, _args) do
+    Logger.info("Starting application #{__MODULE__}")
     children = [
       # Start the Telemetry supervisor
       PiDashWeb.Telemetry,
@@ -18,8 +19,8 @@ defmodule PiDash.Application do
       # Start a worker by calling: PiDash.Worker.start_link(arg)
       # {PiDash.Worker, arg}
       %{
-        id: ElmConnectorStatem,
-        start: {ElmConnectorStatem, :start_link, [serial_port()]}
+        id: Elm.ConnectorStatem,
+        start: {Elm.ConnectorStatem, :start_link, [serial_port()]}
       }
       # TODO start pid sup after configuration of elm
       # %{
@@ -48,7 +49,7 @@ defmodule PiDash.Application do
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end
 
-  defp serial_port() do
+  def serial_port() do
     case find_serial_port() do
       nil -> Application.fetch_env!(:pi_dash, :serial_port)
       {name, _info} -> name
