@@ -77,7 +77,7 @@ defmodule Elm.ConnectorStatem do
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
-    Logger.debug("Got from ELM: \t#{inspect(msg)}, state: #{inspect(state)}")
+    Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
     msg
     |> prepare_received()
@@ -85,7 +85,7 @@ defmodule Elm.ConnectorStatem do
   end
 
   def handle_event(:cast, {:write, msg}, state, data) do
-    Logger.debug("Write to ELM: \t#{inspect(msg)}, state: #{inspect(state)}")
+    Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
     :ok = Circuits.UART.write(data.uart_port_pid, msg)
     :keep_state_and_data
   end
