@@ -124,7 +124,9 @@ defmodule Elm.ConnectorStatem do
       String.contains?(msg, "A") and data.last_sent_command == "DPN" ->
         {to_send, rest} = List.pop_at(@obd_pids_supported, 0)
         write_command(to_send)
-        {:next_state, :get_supported_pids, %Data{data | protocol_number: msg, last_sent_command: to_send, elm_queue: rest}}
+
+        {:next_state, :get_supported_pids,
+         %Data{data | protocol_number: msg, last_sent_command: to_send, elm_queue: rest}}
 
       true ->
         :keep_state_and_data
@@ -142,18 +144,20 @@ defmodule Elm.ConnectorStatem do
         {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
 
       data.last_sent_command == "0100" ->
-        Logger.info("Supported PIDs for mode 01 (show current data): #{inspect msg}")
+        Logger.info("Supported PIDs for mode 01 (show current data): #{inspect(msg)}")
         {to_send, rest} = List.pop_at(@obd_pids_supported, 0)
         write_command(to_send)
-        {:next_state, :get_supported_pids, %Data{data | supported_pids: data.supported_pids ++ [msg], elm_queue: rest}}
+
+        {:next_state, :get_supported_pids,
+         %Data{data | supported_pids: data.supported_pids ++ [msg], elm_queue: rest}}
 
       data.last_sent_command == "0900" ->
-        Logger.info("Supported PIDs for mode 09 (show current data): #{inspect msg}")
+        Logger.info("Supported PIDs for mode 09 (show current data): #{inspect(msg)}")
         # TODO: handle going to connected_configured (get available pids, then start PidSup etc)
 
-        {:next_state, :connected_configured, %Data{data | supported_pids: data.supported_pids ++ [msg]}}
+        {:next_state, :connected_configured,
+         %Data{data | supported_pids: data.supported_pids ++ [msg]}}
     end
-
   end
 
   defp prepare_received(msg) do

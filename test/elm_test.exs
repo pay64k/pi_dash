@@ -5,24 +5,23 @@ defmodule ElmTest do
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
-    ExMeck.expect(Circuits.UART, :enumerate, fn -> [] end)
+    ExMeck.expect(Circuits.UART, :enumerate, fn -> [{"port", %{manufacturer: "Prolific"}}] end)
 
-    serial_port = "test_port"
-
-    pid = start_connector(serial_port)
+    pid = start_connector()
 
     on_exit(fn ->
       ExMeck.unload()
     end)
-    {:ok, connector_pid: pid, serial_port: serial_port}
+    {:ok, connector_pid: pid, serial_port: "port"}
   end
 
-  test "open connection", context do
+  test "open connection, send ATZ", context do
     assert get_state() == :configuring
     send_to_connector("ELM v1.5", context)
     assert get_state() == :configuring
-    
   end
+
+  # Private
 
   defp send_to_connector(msg, context) do
     pid = context[:connector_pid]
@@ -30,11 +29,11 @@ defmodule ElmTest do
     send(pid, {:circuits_uart, port, msg})
   end
 
-  defp start_connector(serial_port) do
+  defp start_connector() do
     {:ok, pid} =
       start_supervised(%{
         id: Elm.ConnectorStatem,
-        start: {Elm.ConnectorStatem, :start_link, [serial_port]}
+        start: {Elm.ConnectorStatem, :start_link, []}
       })
       pid
   end
