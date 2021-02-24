@@ -22,11 +22,6 @@ defmodule PiDash.Application do
         id: Elm.ConnectorStatem,
         start: {Elm.ConnectorStatem, :start_link, []}
       }
-      # TODO start pid sup after configuration of elm
-      # %{
-      #   id: Obd.PidSup,
-      #   start: {Obd.PidSup, :start_link, [pids_to_monitor()]}
-      # }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -44,7 +39,7 @@ defmodule PiDash.Application do
   end
 
   # TODO: read all setting from property file, in env.sh point to location of the file
-  defp pids_to_monitor() do
+  def pids_to_monitor() do
     [{"0C", 350}, {"0D", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end

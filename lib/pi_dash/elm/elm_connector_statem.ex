@@ -39,7 +39,7 @@ defmodule Elm.ConnectorStatem do
   @obd_pids_supported [
     # PIDs supported [01 - 20] for 'Show current data' mode
     "0100",
-    # PIDs supported [01 - 20] 'Request vehicle information' mode
+    # PIDs supported [01 - 20] for 'Request vehicle information' mode
     "0900"
   ]
 
@@ -73,6 +73,16 @@ defmodule Elm.ConnectorStatem do
   end
 
   def handle_event(:info, {:circuits_uart, port, ""}, _state, _data = %Data{port: port}) do
+    :keep_state_and_data
+  end
+
+  def handle_event(
+        :info,
+        {:circuits_uart, port, msg},
+        :connected_configured,
+        _data = %Data{port: port}
+      ) do
+    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, msg) end)
     :keep_state_and_data
   end
 
@@ -145,15 +155,15 @@ defmodule Elm.ConnectorStatem do
 
       data.last_sent_command == "0100" ->
         Logger.info("Supported PIDs for mode 01 (show current data): #{inspect(msg)}")
-        {to_send, rest} = List.pop_at(@obd_pids_supported, 0)
+        {to_send, rest} = List.pop_at(data.elm_queue, 0)
         write_command(to_send)
 
         {:next_state, :get_supported_pids,
-         %Data{data | supported_pids: data.supported_pids ++ [msg], elm_queue: rest}}
+         %Data{data | supported_pids: data.supported_pids ++ [msg], last_sent_command: to_send, elm_queue: rest}}
 
       data.last_sent_command == "0900" ->
         Logger.info("Supported PIDs for mode 09 (show current data): #{inspect(msg)}")
-        # TODO: handle going to connected_configured (get available pids, then start PidSup etc)
+        start_pid_sup()
 
         {:next_state, :connected_configured,
          %Data{data | supported_pids: data.supported_pids ++ [msg]}}
@@ -232,5 +242,16 @@ defmodule Elm.ConnectorStatem do
       List.first(found) == nil -> {nil, devices}
       true -> List.first(found)
     end
+  end
+
+  def start_pid_sup() do
+    child = %{
+      id: Obd.PidSup,
+      start: {Obd.PidSup, :start_link, [PiDash.Application.pids_to_monitor()]}
+    }
+
+    opts = [strategy: :one_for_one, name: __MODULE__, max_restarts: 0]
+    {:ok, pid} = Supervisor.start_link(child, opts)
+    pid
   end
 end

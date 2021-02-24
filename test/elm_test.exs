@@ -1,6 +1,6 @@
 defmodule ElmTest do
   use ExUnit.Case
-
+  
   setup_all do
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
@@ -12,13 +12,38 @@ defmodule ElmTest do
     on_exit(fn ->
       ExMeck.unload()
     end)
+
     {:ok, connector_pid: pid, serial_port: "port"}
   end
 
-  test "open connection, send ATZ", context do
+  test "sunny day - full configuration ok", context do
+    # res = IO.inspect(:meck.history(Circuits.UART))
+    assert_wrote("AT Z")
     assert get_state() == :configuring
     send_to_connector("ELM v1.5", context)
     assert get_state() == :configuring
+    send_to_connector("OK", context)
+    assert_wrote("AT E0")
+    send_to_connector("OK", context)
+    assert_wrote("AT CFC1")
+    send_to_connector("OK", context)
+    assert_wrote("AT AL")
+    send_to_connector("OK", context)
+    assert_wrote("AT H1")
+    send_to_connector("OK", context)
+    assert_wrote("AT L0")
+    send_to_connector("OK", context)
+    assert_wrote("AT S0")
+    send_to_connector("OK", context)
+    assert_wrote("AT DPN")
+    send_to_connector("A0", context)
+    assert get_state() == :get_supported_pids
+    assert_wrote("0100")
+    send_to_connector("BE1FA813", context)
+    assert_wrote("0900")
+    send_to_connector("A9236C71", context)
+    assert get_state() == :connected_configured
+
   end
 
   # Private
@@ -35,7 +60,12 @@ defmodule ElmTest do
         id: Elm.ConnectorStatem,
         start: {Elm.ConnectorStatem, :start_link, []}
       })
-      pid
+
+    pid
+  end
+
+  defp assert_wrote(msg) do
+    assert true == ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
   end
 
   defp get_state() do
@@ -43,6 +73,7 @@ defmodule ElmTest do
       Elm.ConnectorStatem
       |> Process.whereis()
       |> :sys.get_state()
+
     state
   end
 end
