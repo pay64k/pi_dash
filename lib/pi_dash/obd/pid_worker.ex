@@ -19,13 +19,8 @@ defmodule Obd.PidWorker do
      %{int_obd_pid: int_obd_pid, obd_pid: obd_pid, interval: interval, tref: tref, last_value: 0}}
   end
 
-  # def handle_info(:start, state = %{interval: interval}) do
-  #   {:ok, tref} = :timer.send_interval(interval, self(), :write)
-  #   {:noreply, %{state | tref: tref}}
-  # end
-
   def handle_info(:write, state = %{obd_pid: obd_pid}) do
-    Elm.Connector.send(@obd_mode <> obd_pid)
+    Elm.ConnectorStatem.write_command(@obd_mode <> obd_pid)
     {:noreply, state}
   end
 

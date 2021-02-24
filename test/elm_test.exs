@@ -1,6 +1,6 @@
 defmodule ElmTest do
   use ExUnit.Case
-  
+
   setup_all do
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
@@ -17,7 +17,12 @@ defmodule ElmTest do
   end
 
   test "sunny day - full configuration ok", context do
-    # res = IO.inspect(:meck.history(Circuits.UART))
+    full_configuration(context)
+  end
+
+  # Private
+
+  defp full_configuration(context) do
     assert_wrote("AT Z")
     assert get_state() == :configuring
     send_to_connector("ELM v1.5", context)
@@ -43,10 +48,7 @@ defmodule ElmTest do
     assert_wrote("0900")
     send_to_connector("A9236C71", context)
     assert get_state() == :connected_configured
-
   end
-
-  # Private
 
   defp send_to_connector(msg, context) do
     pid = context[:connector_pid]

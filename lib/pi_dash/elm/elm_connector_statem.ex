@@ -159,7 +159,12 @@ defmodule Elm.ConnectorStatem do
         write_command(to_send)
 
         {:next_state, :get_supported_pids,
-         %Data{data | supported_pids: data.supported_pids ++ [msg], last_sent_command: to_send, elm_queue: rest}}
+         %Data{
+           data
+           | supported_pids: data.supported_pids ++ [msg],
+             last_sent_command: to_send,
+             elm_queue: rest
+         }}
 
       data.last_sent_command == "0900" ->
         Logger.info("Supported PIDs for mode 09 (show current data): #{inspect(msg)}")
@@ -245,12 +250,14 @@ defmodule Elm.ConnectorStatem do
   end
 
   def start_pid_sup() do
-    child = %{
-      id: Obd.PidSup,
-      start: {Obd.PidSup, :start_link, [PiDash.Application.pids_to_monitor()]}
-    }
+    child = [
+      %{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, [PiDash.Application.pids_to_monitor()]}
+      }
+    ]
 
-    opts = [strategy: :one_for_one, name: __MODULE__, max_restarts: 0]
+    opts = [strategy: :one_for_one, max_restarts: 0]
     {:ok, pid} = Supervisor.start_link(child, opts)
     pid
   end
