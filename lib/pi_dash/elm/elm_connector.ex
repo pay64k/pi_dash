@@ -1,129 +1,182 @@
-defmodule Elm.Connector do
-  use GenServer
+defmodule Elm.Data do
+  defstruct [
+    :port,
+    :uart_port_pid,
+    :elm_queue,
+    :elm_version,
+    :last_sent_command,
+    :protocol_number,
+    supported_pids: []
+  ]
+end
 
+defmodule Elm.Connector do
+  use GenStateMachine
+  alias Elm.Data
   require Logger
 
-  def start_link(serial_port) do
-    GenServer.start_link(__MODULE__, [serial_port], name: __MODULE__)
+  @elm_opts [
+    # echo off
+    "E0",
+    # set protocol to automatic
+    "SP0",
+    # flowcontrol
+    "CFC1",
+    # allow long messages
+    "AL",
+    # show headers
+    "H1",
+    # no line feeds
+    "L0",
+    # no whitespaces
+    "S0",
+    # Describe the Protocol by Number
+    "DPN"
+  ]
+
+  @elm_device_name "Prolific"
+
+  @obd_pids_supported [
+    # PIDs supported [01 - 20] for 'Show current data' mode
+    "0100",
+    # PIDs supported [01 - 20] for 'Request vehicle information' mode
+    "0900"
+  ]
+
+  def write_at_command(msg) do
+    GenStateMachine.cast(__MODULE__, {:write, "AT " <> msg})
   end
 
-  def init([serial_port]) do
+  def write_command(msg) do
+    GenStateMachine.cast(__MODULE__, {:write, msg})
+  end
+
+  def start_link() do
+    GenStateMachine.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  def init(_) do
     {:ok, uart_port_pid} = Circuits.UART.start_link()
-
-    res =
-      case open_serial(uart_port_pid, serial_port) do
-        :ok ->
-          elm_opts = [
-            # reset all
-            "Z",
-            # echo off
-            "E0",
-            # set protocol to automatic
-            "SP0",
-            # flowcontrol
-            "CFC1",
-            # allow long messages
-            "AL",
-            # show headers
-            "H1",
-            # no line feeds
-            "L0",
-            # no whitespaces
-            "S0",
-            # Describe the Protocol by Number
-            "DPN",
-            # PIDs supported [01 - 20]
-            "0100"
-          ]
-
-          Logger.info("Setting up ELM with commands: #{inspect(elm_opts)}")
-          Enum.each(elm_opts, fn command -> send({:at, command}) end)
-          :ok
-      end
-
-    :timer.send_after(5000, self(), :start_workers)
-    {res, %{serial_port: serial_port, uart_port_pid: uart_port_pid}}
+    GenStateMachine.cast(__MODULE__, :open_connection)
+    {:ok, :connect, %Data{elm_queue: @elm_opts, uart_port_pid: uart_port_pid}}
   end
 
-  def send({:at, data = "0100"}) do
-    GenServer.cast(__MODULE__, {:send, data})
+  def handle_event(
+        :info,
+        {:circuits_uart, port, {:error, :einval}},
+        state,
+        data = %Data{port: port}
+      ) do
+    Logger.error("ELM disconnected on #{port} in state: #{state}")
+    GenStateMachine.cast(__MODULE__, :open_connection)
+    {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
   end
 
-  def send({:at, data}) do
-    GenServer.cast(__MODULE__, {:send, "AT" <> data})
+  def handle_event(:info, {:circuits_uart, port, ""}, _state, _data = %Data{port: port}) do
+    :keep_state_and_data
   end
 
-  def send(data) do
-    GenServer.cast(__MODULE__, {:send, data})
+  def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
+    Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
+
+    msg
+    |> prepare_received()
+    |> handle_msg(state, data)
   end
 
-  def handle_cast({:send, data}, state = %{uart_port_pid: pid}) do
-    Logger.info("Sending #{inspect(data)}")
-    :ok = Circuits.UART.write(pid, data)
-    {:noreply, state}
+  def handle_event(:cast, {:write, msg}, state, data) do
+    Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
+    :ok = Circuits.UART.write(data.uart_port_pid, msg)
+    :keep_state_and_data
   end
 
-  def handle_info(:start_workers, state) do
-    send_to_workers(:start)
-    {:noreply, state}
-  end
+  def handle_event(:cast, :open_connection, :connect, data) do
+    case open_serial(data.uart_port_pid) do
+      {:ok, port} ->
+        write_at_command("Z")
+        {:next_state, :configuring, %{data | port: port, last_sent_command: "Z"}}
 
-  def handle_info({:circuits_uart, serial_port, ""}, state = %{serial_port: serial_port}) do
-    {:noreply, state}
-  end
-
-  def handle_info({:circuits_uart, serial_port, data}, state = %{serial_port: serial_port}) do
-    Logger.debug(
-      "received on #{serial_port}: clean: #{inspect(prepare_received(data))} , raw: #{
-        inspect(data)
-      }"
-    )
-
-    clean_data = prepare_received(data)
-    # data
-    # |> prepare_received
-    # |> handle_data
-
-    # {:noreply, state}
-    cond do
-      String.starts_with?(clean_data, "AT") or
-        String.contains?(clean_data, "OK") or
-        String.contains?(clean_data, "ELM") or
-        String.contains?(clean_data, "TDPN") or
-        String.contains?(clean_data, "SEARCHING...") or
-        String.equivalent?(clean_data, "A") or
-        String.equivalent?(clean_data, "A0") or
-        String.equivalent?(clean_data, "0100") or
-          String.contains?(clean_data, "486B104100BE3EB811C9") ->
-        {:noreply, state}
-
-      true ->
-        clean_data
-        # |> prepare_received
-        |> to_binary
-        |> format_data
-        |> send_to_workers
-
-        {:noreply, state}
+      :error ->
+        Process.sleep(5000)
+        GenStateMachine.cast(__MODULE__, :open_connection)
+        :keep_state_and_data
     end
   end
 
-  # def handle_data(">OK"), do: :ok
-  # def handle_data("A0"), do: :ok
-  # def handle_data("SEARCHING..."), do: :ok
-  # def handle_data("ELM327 v1.5"), do: :ok
-  # def handle_data(_), do: :ok
+  defp handle_msg(msg, :configuring, data) do
+    cond do
+      String.contains?(msg, "Z") and data.last_sent_command == "Z" ->
+        :keep_state_and_data
 
-  # def handle_data(data) do
-  #   data
-  #   |> prepare_received
-  #   |> to_binary
-  #   |> format_data
-  #   |> send_to_workers
-  # end
+      String.contains?(msg, "ELM") and data.last_sent_command == "Z" ->
+        Logger.info("Connected ELM version: #{msg}")
+        {to_send, rest} = List.pop_at(data.elm_queue, 0)
+        write_at_command(to_send)
 
-  defp prepare_received(data) do
-    data
+        {:next_state, :configuring,
+         %Data{data | elm_version: msg, last_sent_command: to_send, elm_queue: rest}}
+
+      String.contains?(msg, "OK") ->
+        {to_send, rest} = List.pop_at(data.elm_queue, 0)
+        write_at_command(to_send)
+        {:next_state, :configuring, %Data{data | last_sent_command: to_send, elm_queue: rest}}
+
+      String.contains?(msg, "A") and data.last_sent_command == "DPN" ->
+        {to_send, rest} = List.pop_at(@obd_pids_supported, 0)
+        write_command(to_send)
+
+        {:next_state, :get_supported_pids,
+         %Data{data | protocol_number: msg, last_sent_command: to_send, elm_queue: rest}}
+
+      true ->
+        :keep_state_and_data
+    end
+  end
+
+  defp handle_msg(msg, :get_supported_pids, data) do
+    cond do
+      String.contains?(msg, "SEARCHING") ->
+        :keep_state_and_data
+
+      String.contains?(msg, "UNABLE TO CONNECT") ->
+        Logger.error("Unable to connect to vehicle ECU! Restarting...")
+        GenStateMachine.cast(__MODULE__, :open_connection)
+        {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
+
+      data.last_sent_command == "0100" ->
+        Logger.info("Supported PIDs for mode 01 (show current data): #{inspect(msg)}")
+        {to_send, rest} = List.pop_at(data.elm_queue, 0)
+        write_command(to_send)
+
+        {:next_state, :get_supported_pids,
+         %Data{
+           data
+           | supported_pids: data.supported_pids ++ [msg],
+             last_sent_command: to_send,
+             elm_queue: rest
+         }}
+
+      data.last_sent_command == "0900" ->
+        Logger.info("Supported PIDs for mode 09 (show current data): #{inspect(msg)}")
+        start_pid_sup()
+
+        {:next_state, :connected_configured,
+         %Data{data | supported_pids: data.supported_pids ++ [msg]}}
+    end
+  end
+
+  defp handle_msg(msg, :connected_configured, _data) do
+    to_send =
+      msg
+      |> to_binary()
+      |> format_data()
+
+    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, to_send) end)
+    :keep_state_and_data
+  end
+
+  defp prepare_received(msg) do
+    msg
     |> String.replace(">", "")
   end
 
@@ -145,31 +198,31 @@ defmodule Elm.Connector do
     %{mode: mode, pid: pid, data: data}
   end
 
-  # TODO: send only to the one with matching pid
-  defp send_to_workers(data) do
-    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, data) end)
-  end
-
-  defp open_serial(uart_port_pid, serial_port) do
-    Logger.info("Attemting to connect to ELM on serial port: #{inspect(serial_port)} ...")
-
+  defp open_serial(uart_port_pid) do
+    # TODO: pass opts from application, from env
     opts = [
       speed: 38400,
       data_bits: 8,
       parity: :none,
       stop_bits: 1,
       framing: {Circuits.UART.Framing.Line, separator: "\r"},
-      # rx_framing_timeout: 1,
       active: true
-      # id: :pid
     ]
+
+    serial_port = serial_port()
+
+    Logger.info(
+      "Attemting to connect to ELM on serial port: #{inspect(serial_port)} with opts: #{
+        inspect(opts)
+      }"
+    )
 
     res = Circuits.UART.open(uart_port_pid, serial_port, opts)
 
     case res do
       :ok ->
         Logger.info("Connected to ELM on serial port #{inspect(serial_port)}!")
-        :ok
+        {:ok, serial_port}
 
       {:error, reason} ->
         Logger.error(
@@ -177,8 +230,53 @@ defmodule Elm.Connector do
             inspect(reason)
           }"
         )
-
+        # TODO handle :eagain
         :error
     end
+  end
+
+  def serial_port() do
+    case find_serial_port() do
+      {nil, all_serial_devices} ->
+        Logger.error(
+          "Serial device from manfucturer #{@elm_device_name}, not found!
+           Attemting to use device set in config. All available serial devices: #{
+            inspect(all_serial_devices)
+          }"
+        )
+
+        Application.get_env(:pi_dash, :serial_port, :not_set)
+
+      {name, _info} ->
+        name
+    end
+  end
+
+  defp find_serial_port() do
+    devices = Circuits.UART.enumerate()
+
+    found =
+      Enum.filter(devices, fn {_, m} ->
+        :manufacturer in Map.keys(m) and
+          String.contains?(m.manufacturer, @elm_device_name)
+      end)
+
+    cond do
+      List.first(found) == nil -> {nil, devices}
+      true -> List.first(found)
+    end
+  end
+
+  def start_pid_sup() do
+    child = [
+      %{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, [PiDash.Application.pids_to_monitor()]}
+      }
+    ]
+
+    opts = [strategy: :one_for_one, max_restarts: 0]
+    {:ok, pid} = Supervisor.start_link(child, opts)
+    pid
   end
 end

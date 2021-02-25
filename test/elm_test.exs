@@ -59,8 +59,8 @@ defmodule ElmTest do
   defp start_connector() do
     {:ok, pid} =
       start_supervised(%{
-        id: Elm.ConnectorStatem,
-        start: {Elm.ConnectorStatem, :start_link, []}
+        id: Elm.Connector,
+        start: {Elm.Connector, :start_link, []}
       })
 
     pid
@@ -72,7 +72,7 @@ defmodule ElmTest do
 
   defp get_state() do
     {state, _state_data} =
-      Elm.ConnectorStatem
+      Elm.Connector
       |> Process.whereis()
       |> :sys.get_state()
 

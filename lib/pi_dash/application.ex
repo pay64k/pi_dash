@@ -19,8 +19,8 @@ defmodule PiDash.Application do
       # Start a worker by calling: PiDash.Worker.start_link(arg)
       # {PiDash.Worker, arg}
       %{
-        id: Elm.ConnectorStatem,
-        start: {Elm.ConnectorStatem, :start_link, []}
+        id: Elm.Connector,
+        start: {Elm.Connector, :start_link, []}
       }
     ]
 
