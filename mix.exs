@@ -41,6 +41,7 @@ defmodule PiDash.MixProject do
   defp deps do
     [
       {:circuits_uart, "~> 1.4"},
+      {:ex_bin, "~> 0.4.0"},
       {:logger_file_backend, "~> 0.0.11"},
       {:gen_state_machine, "~> 3.0"},
       {:phoenix, "~> 1.5.7"},

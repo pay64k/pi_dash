@@ -157,7 +157,7 @@ defmodule Elm.Connector do
          }}
 
       data.last_sent_command == "0900" ->
-        Logger.info("Supported PIDs for mode 09 (show current data): #{inspect(msg)}")
+        Logger.info("Supported PIDs for mode 09 (request vehicle information): #{inspect(msg)}")
         start_pid_sup()
 
         {:next_state, :connected_configured,

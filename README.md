@@ -4,6 +4,8 @@ https://www.csselectronics.com/screen/page/simple-intro-obd2-explained/language/
 
 OBD codes: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01
 
+https://python-obd.readthedocs.io/en/latest/Command%20Tables/
+
 elm emulator: https://github.com/Ircama/ELM327-emulator
 switch to car, after running `elm` - `scenario car`
 
@@ -13,17 +15,6 @@ draw here: https://www.drawsvg.org/drawsvg.html and convert here: https://editor
 
 elm commands: https://www.elmelectronics.com/wp-content/uploads/2016/07/ELM327DS.pdf
 
-%{
-  "/dev/cu.Bluetooth-Incoming-Port" => %{},
-  "/dev/cu.LGSH2DD-BTSPP1" => %{},
-  "/dev/cu.LGSH2DD-BTSPP2" => %{},
-  "/dev/cu.LGSH2DD-BTSPP3" => %{},
-  "/dev/cu.usbserial-1420" => %{
-    manufacturer: "Prolific Technology Inc.",
-    product_id: 8963,
-    vendor_id: 1659
-  }
-}
 
 https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408
 

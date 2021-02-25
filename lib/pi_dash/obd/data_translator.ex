@@ -22,18 +22,29 @@ defmodule Obd.DataTranslator do
     {:error, :unhandled}
   end
 
-  def parse_supported_pids(msg) do
-    split_string(msg)
+  def parse_supported_pids(hex_string) do
+    stream =
+      hex_string
+      |> Base.decode16!()
+      |> ExBin.bits()
+
+    {_, supported_pids} =
+      Enum.reduce(stream, {1, []}, fn bit, {count, acc} ->
+        case bit do
+          0 -> {count + 1, acc}
+          1 -> {count + 1, acc ++ [convert_and_pad(count)]}
+        end
+      end)
+
+    supported_pids
   end
 
-  defp split_string(str) do
-    split_string(str,[])
-  end
+  defp convert_and_pad(int) do
+    str = Integer.to_string(int, 16)
 
-  defp split_string("", acc), do: acc
-  defp split_string(str, acc) do
-    {s, rest} = String.split_at(str, 2)
-    split_string(rest, acc ++ [s])
+    case String.length(str) do
+      1 -> String.pad_leading(str, 2, "0")
+      2 -> str
+    end
   end
-
 end
