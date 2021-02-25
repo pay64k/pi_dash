@@ -76,16 +76,6 @@ defmodule Elm.ConnectorStatem do
     :keep_state_and_data
   end
 
-  def handle_event(
-        :info,
-        {:circuits_uart, port, msg},
-        :connected_configured,
-        _data = %Data{port: port}
-      ) do
-    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, msg) end)
-    :keep_state_and_data
-  end
-
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
     Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
@@ -175,9 +165,37 @@ defmodule Elm.ConnectorStatem do
     end
   end
 
+  defp handle_msg(msg, :connected_configured, _data) do
+    to_send =
+      msg
+      |> to_binary()
+      |> format_data()
+
+    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, to_send) end)
+    :keep_state_and_data
+  end
+
   defp prepare_received(msg) do
     msg
     |> String.replace(">", "")
+  end
+
+  defp to_binary(data) do
+    supl_data =
+      case rem(byte_size(data), 2) do
+        0 -> data
+        1 -> "0" <> data
+      end
+
+    Base.decode16!(supl_data)
+  end
+
+  defp format_data(<<_id1, _id2, _size, mode, pid, data::binary>>) do
+    %{mode: mode, pid: pid, data: data}
+  end
+
+  defp format_data(<<_id1, _id2, mode, pid, data::binary>>) do
+    %{mode: mode, pid: pid, data: data}
   end
 
   defp open_serial(uart_port_pid) do
@@ -212,7 +230,7 @@ defmodule Elm.ConnectorStatem do
             inspect(reason)
           }"
         )
-
+        # TODO handle :eagain
         :error
     end
   end
