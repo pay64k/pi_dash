@@ -165,6 +165,12 @@ defmodule Elm.Connector do
     end
   end
 
+  defp handle_msg("NO DATA", :connected_configured, _data) do
+    Logger.error("Lost conenction to car's ECU! Restarting...")
+    GenStateMachine.cast(__MODULE__, :open_connection)
+    {:next_state, :connect, %Data{}}
+  end
+
   defp handle_msg(msg, :connected_configured, _data) do
     to_send =
       msg
