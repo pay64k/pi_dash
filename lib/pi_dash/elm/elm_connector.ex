@@ -13,6 +13,7 @@ end
 defmodule Elm.Connector do
   use GenStateMachine
   alias Elm.Data
+  alias Obd.PidTranslator, as: PT
   require Logger
 
   @elm_opts [
@@ -37,10 +38,9 @@ defmodule Elm.Connector do
   @elm_device_name "Prolific"
 
   @obd_pids_supported [
-    # PIDs supported [01 - 20] for 'Show current data' mode
-    "0100",
-    # PIDs supported [01 - 20] for 'Request vehicle information' mode
-    "0900"
+    "01" <> PT.name_to_pid("PIDS_A"),
+    "01" <> PT.name_to_pid("PIDS_B"),
+    "01" <> PT.name_to_pid("PIDS_C")
   ]
 
   def write_at_command(msg) do
@@ -143,25 +143,28 @@ defmodule Elm.Connector do
         GenStateMachine.cast(__MODULE__, :open_connection)
         {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
 
-      data.last_sent_command == "0100" ->
-        Logger.info("Supported PIDs for mode 01 (show current data): #{inspect(msg)}")
+      data.last_sent_command in @obd_pids_supported and
+          Enum.count(data.elm_queue) > 0 ->
+        supported = Obd.DataTranslator.parse_supported_pids(msg)
+        Logger.info("Supported PIDs: #{inspect(supported)}")
         {to_send, rest} = List.pop_at(data.elm_queue, 0)
         write_command(to_send)
 
         {:next_state, :get_supported_pids,
          %Data{
            data
-           | supported_pids: data.supported_pids ++ [msg],
+           | supported_pids: data.supported_pids ++ [supported],
              last_sent_command: to_send,
              elm_queue: rest
          }}
 
-      data.last_sent_command == "0900" ->
-        Logger.info("Supported PIDs for mode 09 (request vehicle information): #{inspect(msg)}")
+      Enum.count(data.elm_queue) == 0 ->
+        supported = Obd.DataTranslator.parse_supported_pids(msg)
+        Logger.info("Supported PIDs: #{inspect(supported)}")
         start_pid_sup()
 
         {:next_state, :connected_configured,
-         %Data{data | supported_pids: data.supported_pids ++ [msg]}}
+         %Data{data | supported_pids: data.supported_pids ++ [supported]}}
     end
   end
 
@@ -236,6 +239,7 @@ defmodule Elm.Connector do
             inspect(reason)
           }"
         )
+
         # TODO handle :eagain
         :error
     end

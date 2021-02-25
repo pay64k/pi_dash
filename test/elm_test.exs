@@ -17,7 +17,7 @@ defmodule ElmTest do
   end
 
   test "sunny day - full configuration ok", context do
-    full_configuration(context)
+    assert true == full_configuration(context)
   end
 
   # Private
@@ -45,9 +45,12 @@ defmodule ElmTest do
     assert get_state() == :get_supported_pids
     assert_wrote("0100")
     send_to_connector("BE1FA813", context)
-    assert_wrote("0900")
-    send_to_connector("A9236C71", context)
+    assert_wrote("0120")
+    send_to_connector("F913CA51", context)
+    assert_wrote("0140")
+    send_to_connector("1E893CFF", context)
     assert get_state() == :connected_configured
+    true
   end
 
   defp send_to_connector(msg, context) do
@@ -68,6 +71,7 @@ defmodule ElmTest do
 
   defp assert_wrote(msg) do
     assert true == ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
+    ExMeck.reset(Circuits.UART)
   end
 
   defp get_state() do
