@@ -40,7 +40,7 @@ defmodule PiDash.Application do
 
   # TODO: read all setting from property file, in env.sh point to location of the file
   def pids_to_monitor() do
-    [{"0C", 350}, {"0D", 1000}]
+    [{"RPM", 350}, {"SPEED", 1000}]
     |> Enum.map(fn {pid, interval} -> %{obd_pid: pid, interval: interval} end)
   end
 end

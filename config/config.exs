@@ -1,7 +1,7 @@
 use Mix.Config
 
-# config :pi_dash,
-#   serial_port: "/dev/tty.usbserial-1420"
+config :pi_dash,
+  serial_port: "/dev/pts/2"
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,
@@ -21,7 +21,7 @@ config :phoenix, :json_library, Jason
 
 config :logger,
   metadata: :all,
-  backends: [:console, {LoggerFileBackend, :logger_file_backend}]
+  backends: [ {LoggerFileBackend, :logger_file_backend}]
 
 config :logger, :logger_file_backend,
   path: "./pi_dash.log",

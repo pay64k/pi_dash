@@ -25,14 +25,14 @@ defmodule Obd.PidWorker do
   end
 
   def handle_info(
-        %{data: data, pid: int_obd_pid},
+        msg = %{data: data, pid: int_obd_pid},
         state = %{int_obd_pid: int_obd_pid, last_value: last_value}
       ) do
     Logger.debug(
       "obd pid worker #{int_obd_pid} recieved data: #{inspect(data, binaries: :as_binaries)}"
     )
 
-    case Obd.DataTranslator.handle_data(int_obd_pid, data) do
+    case Obd.DataTranslator.handle_data(msg) do
       {:error, reason} ->
         Logger.warn(
           "could not translate: #{inspect(data, binaries: :as_binaries)}, reason: #{
@@ -40,14 +40,14 @@ defmodule Obd.PidWorker do
           }"
         )
 
-        msg = %{value: last_value, obd_pid: int_obd_pid, units: nil}
-        PiDashWeb.RoomChannel.send_to_channel(msg)
+        to_web = %{value: last_value, obd_pid: int_obd_pid, units: nil}
+        PiDashWeb.RoomChannel.send_to_channel(to_web)
         {:noreply, state}
 
       {value, units} ->
         Logger.debug("obd pid worker #{int_obd_pid} translated data: #{inspect(value)} #{units}")
-        msg = %{value: value, obd_pid: int_obd_pid, units: units}
-        PiDashWeb.RoomChannel.send_to_channel(msg)
+        to_web = %{value: value, obd_pid: int_obd_pid, units: units}
+        PiDashWeb.RoomChannel.send_to_channel(to_web)
         {:noreply, %{state | last_value: value}}
     end
   end

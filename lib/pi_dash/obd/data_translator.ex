@@ -1,7 +1,19 @@
 defmodule Obd.DataTranslator do
   require Logger
+
+  def decode_data(hex_string) do
+    <<_header::24, _mode::8, pid::8, data_and_crc::binary>> = Base.decode16!(hex_string)
+    %{data: data_and_crc, pid: pid}
+  end
+
+  def handle_data(%{data: data, pid: int_obd_pid}) do
+    # pid to name
+    # change handle data from int to atoms
+    Obd.PidTranslator()
+  end
+
   # rpm
-  def handle_data(12, <<a, b, _>>) do
+  def handle_data(12, <<a, b, _crc>>) do
     {(256 * a + b) / 4, "RPM"}
   end
 
@@ -14,7 +26,7 @@ defmodule Obd.DataTranslator do
   end
 
   # vehicle speed
-  def handle_data(13, <<a, _>>) do
+  def handle_data(13, <<a, _crc>>) do
     {a, "km/h"}
   end
 

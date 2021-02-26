@@ -175,13 +175,23 @@ defmodule Elm.Connector do
   end
 
   defp handle_msg(msg, :connected_configured, _data) do
-    to_send =
-      msg
-      |> to_binary()
-      |> format_data()
+    case check_data(msg) do
+      :discarding ->
+        Logger.warn(
+          "Discarding incomplete data: #{msg}, due to odd size of bytes (#{byte_size(msg)}"
+        )
 
-    Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} -> send(worker_pid, to_send) end)
-    :keep_state_and_data
+        :keep_state_and_data
+
+      _ ->
+        to_send = Obd.DataTranslator.decode_data(msg)
+
+        Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} ->
+          send(worker_pid, to_send)
+        end)
+
+        :keep_state_and_data
+    end
   end
 
   defp prepare_received(msg) do
@@ -189,22 +199,11 @@ defmodule Elm.Connector do
     |> String.replace(">", "")
   end
 
-  defp to_binary(data) do
-    supl_data =
-      case rem(byte_size(data), 2) do
-        0 -> data
-        1 -> "0" <> data
-      end
-
-    Base.decode16!(supl_data)
-  end
-
-  defp format_data(<<_id1, _id2, _size, mode, pid, data::binary>>) do
-    %{mode: mode, pid: pid, data: data}
-  end
-
-  defp format_data(<<_id1, _id2, mode, pid, data::binary>>) do
-    %{mode: mode, pid: pid, data: data}
+  defp check_data(hex_string) do
+    case rem(byte_size(hex_string), 2) do
+      0 -> hex_string
+      _ -> :discarding
+    end
   end
 
   defp open_serial(uart_port_pid) do
