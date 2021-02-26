@@ -184,13 +184,8 @@ defmodule Elm.Connector do
         :keep_state_and_data
 
       _ ->
-        to_send = Obd.DataTranslator.decode_data(msg)
-
-        # TODO: send only to the ones with obd_pid_name in return val of decode_data()
-        Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} ->
-          send(worker_pid, to_send)
-        end)
-
+        to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
+        send(Process.whereis(obd_pid_name), {:process, to_send})
         :keep_state_and_data
     end
   end

@@ -19,10 +19,6 @@ defmodule Obd.PidSup do
     Supervisor.init(children, opts)
   end
 
-  def children() do
-    Supervisor.which_children(__MODULE__)
-  end
-
   defp child_spec(%{obd_pid_name: obd_pid_name, interval: interval}) do
     %{
       id: obd_pid_name,

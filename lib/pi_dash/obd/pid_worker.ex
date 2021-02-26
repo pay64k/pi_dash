@@ -24,17 +24,17 @@ defmodule Obd.PidWorker do
   end
 
   def handle_info(
-        msg = %{data: data, obd_pid_name: obd_pid_name},
+        {:process, msg},
         state = %{obd_pid_name: obd_pid_name, last_value: last_value}
       ) do
     Logger.debug(
-      "Pid worker #{inspect obd_pid_name} recieved data: #{inspect(data, binaries: :as_binaries)}"
+      "Pid worker #{inspect obd_pid_name} recieved data: #{inspect(msg.data, binaries: :as_binaries)}"
     )
 
     case Obd.DataTranslator.handle_data(msg) do
       {:error, reason} ->
         Logger.warn(
-          "could not translate: #{inspect(data, binaries: :as_binaries)}, reason: #{
+          "could not translate: #{inspect(msg.data, binaries: :as_binaries)}, reason: #{
             inspect(reason)
           }"
         )
