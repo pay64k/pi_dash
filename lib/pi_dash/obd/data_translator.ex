@@ -26,6 +26,7 @@ defmodule Obd.DataTranslator do
     stream =
       hex_string
       |> Base.decode16!()
+      |> extract_sup_pids_data()
       |> ExBin.bits()
 
     {_, supported_pids} =
@@ -37,6 +38,10 @@ defmodule Obd.DataTranslator do
       end)
 
     supported_pids
+  end
+
+  def extract_sup_pids_data(<<_header::24, _mode::8, _pid::8, data::32, _crc::8>>) do
+    <<data::32>>
   end
 
   defp convert_and_pad(int) do
