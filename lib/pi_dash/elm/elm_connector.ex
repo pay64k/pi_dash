@@ -186,6 +186,7 @@ defmodule Elm.Connector do
       _ ->
         to_send = Obd.DataTranslator.decode_data(msg)
 
+        # TODO: send only to the ones with obd_pid_name in return val of decode_data()
         Enum.each(Obd.PidSup.children(), fn {_id, worker_pid, _, _} ->
           send(worker_pid, to_send)
         end)
