@@ -23,10 +23,10 @@ defmodule Obd.PidSup do
     Supervisor.which_children(__MODULE__)
   end
 
-  defp child_spec(%{obd_pid: obd_pid, interval: interval}) do
+  defp child_spec(%{obd_pid_name: obd_pid_name, interval: interval}) do
     %{
-      id: String.to_atom(obd_pid),
-      start: {Obd.PidWorker, :start_link, [obd_pid, interval]}
+      id: obd_pid_name,
+      start: {Obd.PidWorker, :start_link, [obd_pid_name, interval]}
     }
   end
 end

@@ -3,36 +3,26 @@ defmodule Obd.DataTranslator do
 
   def decode_data(hex_string) do
     <<_header::24, _mode::8, pid::8, data_and_crc::binary>> = Base.decode16!(hex_string)
-    %{data: data_and_crc, pid: pid}
+
+    obd_pid_name =
+      <<pid::8>>
+      |> Base.encode16()
+      |> Obd.PidTranslator.pid_to_name()
+
+    %{obd_pid_name: obd_pid_name, data: data_and_crc}
   end
 
-  def handle_data(%{data: data, pid: int_obd_pid}) do
-    # pid to name
-    # change handle data from int to atoms
-    # Obd.PidTranslator()
+  def handle_data(%{data: data, obd_pid_name: obd_pid_name}) do
+    handle_data(obd_pid_name, data)
   end
 
-  # rpm
-  def handle_data(12, <<a, b, _crc>>) do
-    {(256 * a + b) / 4, "RPM"}
-  end
+  def handle_data(:rpm, <<a, b, _crc>>), do: {(256 * a + b) / 4, "RPM"}
+  def handle_data(:rpm, <<a, b>>), do: {(256 * a + b) / 4, "RPM"}
+  def handle_data(:rpm, <<_a>>), do: {:error, :malformed}
 
-  def handle_data(12, <<a, b>>) do
-    {(256 * a + b) / 4, "RPM"}
-  end
+  def handle_data(:speed, <<a, _crc>>), do: {a, "km/h"}
 
-  def handle_data(12, <<_a>>) do
-    {:error, :malformed}
-  end
-
-  # vehicle speed
-  def handle_data(13, <<a, _crc>>) do
-    {a, "km/h"}
-  end
-
-  def handle_data(_obd_pid, _data) do
-    {:error, :unhandled}
-  end
+  def handle_data(_obd_pid, _data), do: {:error, :unhandled}
 
   def parse_supported_pids(hex_string) do
     stream =

@@ -20,6 +20,12 @@ defmodule ElmTest do
     assert true == full_configuration(context)
   end
 
+  test "start and recieve some data", context do
+    assert true == full_configuration(context)
+    Process.sleep(1000)
+    send_to_connector("486B10410C0F3251", context)
+  end
+
   # Private
 
   defp full_configuration(context) do
@@ -44,11 +50,11 @@ defmodule ElmTest do
     send_to_connector("A0", context)
     assert get_state() == :get_supported_pids
     assert_wrote("0100")
-    send_to_connector("BE1FA813", context)
+    send_to_connector("486B104100BE1FA813C9", context)
     assert_wrote("0120")
-    send_to_connector("F913CA51", context)
+    send_to_connector("486B104100BE1FAFF3C9", context)
     assert_wrote("0140")
-    send_to_connector("1E893CFF", context)
+    send_to_connector("486B104100BE1FAA13C9", context)
     assert get_state() == :connected_configured
     true
   end
