@@ -1,7 +1,7 @@
 defmodule ElmTest do
   use ExUnit.Case
 
-  setup_all do
+  setup do
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
@@ -20,10 +20,17 @@ defmodule ElmTest do
     assert true == full_configuration(context)
   end
 
+  # TODO
   test "start and recieve some data", context do
     assert true == full_configuration(context)
     Process.sleep(1000)
     send_to_connector("486B10410C0F3251", context)
+  end
+
+  # TODO
+  test "supported pids", context do
+    assert true == full_configuration(context)
+    Elm.Connector.get_supported_pids() |> IO.inspect()
   end
 
   # Private

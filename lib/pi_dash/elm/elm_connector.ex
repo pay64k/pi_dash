@@ -51,6 +51,10 @@ defmodule Elm.Connector do
     GenStateMachine.cast(__MODULE__, {:write, msg})
   end
 
+  def get_supported_pids() do
+    GenStateMachine.call(__MODULE__, :get_supported_pids)
+  end
+
   def start_link() do
     GenStateMachine.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -88,6 +92,11 @@ defmodule Elm.Connector do
     Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
     :ok = Circuits.UART.write(data.uart_port_pid, msg)
     :keep_state_and_data
+  end
+
+  def handle_event({:call, from}, :get_supported_pids, state, data) do
+    res = data.supported_pids |> List.flatten() |> Enum.uniq()
+    {:next_state, state, data, [{:reply, from, res}]}
   end
 
   def handle_event(:cast, :open_connection, :connect, data) do
@@ -153,7 +162,7 @@ defmodule Elm.Connector do
         {:next_state, :get_supported_pids,
          %Data{
            data
-           | supported_pids: data.supported_pids ++ [supported],
+           | supported_pids: data.supported_pids ++ supported,
              last_sent_command: to_send,
              elm_queue: rest
          }}
