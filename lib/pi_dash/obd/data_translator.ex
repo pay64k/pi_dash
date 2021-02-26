@@ -9,7 +9,7 @@ defmodule Obd.DataTranslator do
   def handle_data(%{data: data, pid: int_obd_pid}) do
     # pid to name
     # change handle data from int to atoms
-    Obd.PidTranslator()
+    # Obd.PidTranslator()
   end
 
   # rpm

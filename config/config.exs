@@ -21,7 +21,7 @@ config :phoenix, :json_library, Jason
 
 config :logger,
   metadata: :all,
-  backends: [ {LoggerFileBackend, :logger_file_backend}]
+  backends: [:console, {LoggerFileBackend, :logger_file_backend}]
 
 config :logger, :logger_file_backend,
   path: "./pi_dash.log",
