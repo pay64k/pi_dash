@@ -1,7 +1,7 @@
 use Mix.Config
 
-# config :pi_dash,
-#   serial_port: "/dev/pts/2"
+config :pi_dash,
+  serial_port: "/dev/ttys005"
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,

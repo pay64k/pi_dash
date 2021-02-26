@@ -19,11 +19,11 @@ channel.on("update", (message) => {
 
 function update_bar(message) {
   switch(message.obd_pid){
-    case 13:
+    case "speed":
       var bar1 = document.getElementById('speed').ldBar;
       bar1.set(message.value);
       break;
-    case 12:
+    case "rpm":
       var bar1 = document.getElementById('rpm').ldBar;
       bar1.set(message.value); // set second arg to false to disable animation
       break;

@@ -15,7 +15,6 @@ defmodule Obd.PidSup do
       max_seconds: 1
     ]
 
-    # TODO: chldren are started but not sending anything because they wait for :start from elmconnector
     Supervisor.init(children, opts)
   end
 

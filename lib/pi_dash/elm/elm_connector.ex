@@ -16,25 +16,6 @@ defmodule Elm.Connector do
   alias Obd.PidTranslator, as: PT
   require Logger
 
-  @elm_opts [
-    # echo off
-    "E0",
-    # set protocol to automatic
-    "SP0",
-    # flowcontrol
-    "CFC1",
-    # allow long messages
-    "AL",
-    # show headers
-    "H1",
-    # no line feeds
-    "L0",
-    # no whitespaces
-    "S0",
-    # Describe the Protocol by Number
-    "DPN"
-  ]
-
   @elm_device_name "Prolific"
 
   @obd_pids_supported [
@@ -62,7 +43,7 @@ defmodule Elm.Connector do
   def init(_) do
     {:ok, uart_port_pid} = Circuits.UART.start_link()
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:ok, :connect, %Data{elm_queue: @elm_opts, uart_port_pid: uart_port_pid}}
+    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid}}
   end
 
   def handle_event(
@@ -73,7 +54,7 @@ defmodule Elm.Connector do
       ) do
     Logger.error("ELM disconnected on #{port} in state: #{state}")
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
+    {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
   end
 
   def handle_event(:info, {:circuits_uart, port, ""}, _state, _data = %Data{port: port}) do
@@ -102,8 +83,15 @@ defmodule Elm.Connector do
   def handle_event(:cast, :open_connection, :connect, data) do
     case open_serial(data.uart_port_pid) do
       {:ok, port} ->
-        write_at_command("Z")
-        {:next_state, :configuring, %{data | port: port, last_sent_command: "Z"}}
+        case System.get_env("TEST_MODE", nil) do
+          "true" ->
+            start_pid_sup()
+            {:next_state, :connected_configured, %{data | port: port}}
+
+          nil ->
+            write_at_command("Z")
+            {:next_state, :configuring, %{data | port: port, last_sent_command: "Z"}}
+        end
 
       :error ->
         Process.sleep(5000)
@@ -150,7 +138,7 @@ defmodule Elm.Connector do
       String.contains?(msg, "UNABLE TO CONNECT") ->
         Logger.error("Unable to connect to vehicle ECU! Restarting...")
         GenStateMachine.cast(__MODULE__, :open_connection)
-        {:next_state, :connect, %Data{data | elm_queue: @elm_opts}}
+        {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
 
       data.last_sent_command in @obd_pids_supported and
           Enum.count(data.elm_queue) > 0 ->
@@ -200,14 +188,52 @@ defmodule Elm.Connector do
   end
 
   defp prepare_received(msg) do
-    msg
-    |> String.replace(">", "")
+    case System.get_env("TEST_MODE", nil) do
+      "true" ->
+        new_msg =
+          msg
+          |> String.replace(">", "")
+          |> String.replace(" ", "")
+
+        "1" <> new_msg <> "11"
+
+      nil ->
+        msg
+        |> String.replace(">", "")
+    end
   end
 
   defp check_data(hex_string) do
     case rem(byte_size(hex_string), 2) do
       0 -> hex_string
       _ -> :discarding
+    end
+  end
+
+  defp elm_opts() do
+    case System.get_env("TEST_MODE", nil) do
+      "true" ->
+        []
+
+      nil ->
+        [
+          # echo off
+          "E0",
+          # set protocol to automatic
+          "SP0",
+          # flowcontrol
+          "CFC1",
+          # allow long messages
+          "AL",
+          # show headers
+          "H1",
+          # no line feeds
+          "L0",
+          # no whitespaces
+          "S0",
+          # Describe the Protocol by Number
+          "DPN"
+        ]
     end
   end
 
