@@ -21,3 +21,5 @@ https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
 http://www.lcdwiki.com/7inch_HDMI_Display-B
+
+add react to phoenix https://dewetblomerus.com/2018/11/30/react-on-phoenix-1-4.html

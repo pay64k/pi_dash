@@ -1,3 +1,5 @@
+<div id="mountPoint"></div>
+
 <section class="row">
 <div id="rpm" class="ldBar" data-value="50" data-min="0" data-max="7000" data-type="fill" data-img="images/gauge.svg" data-fill-dir="ltr" data-duration=0.15>
 RPM

@@ -15,3 +15,10 @@ import socket from "./socket"
 import "phoenix_html"
 
 var loadingioBar = require("loadingio-bar")
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+const ReactOnPhoenix = () => <div>This is a React Component!!!</div>
+
+ReactDOM.render(<ReactOnPhoenix />, document.getElementById('mountPoint'))
