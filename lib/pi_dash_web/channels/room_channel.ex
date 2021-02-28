@@ -1,11 +1,11 @@
 defmodule PiDashWeb.RoomChannel do
   use PiDashWeb, :channel
 
-  def send_to_channel(data) do
+  def send_to_channel(msg_type, data) do
     Phoenix.PubSub.broadcast(
       PiDash.PubSub,
       "room:dash",
-      data
+      {msg_type, data}
     )
   end
 
@@ -17,8 +17,19 @@ defmodule PiDashWeb.RoomChannel do
     GenServer.cast(__MODULE__, {:send, data})
   end
 
-  def handle_info(data, socket) do
-    push(socket, "update", data)
+  def handle_in("supported_pids", _params, socket) do
+    pids = [:speed, :rpm]
+    push(socket, "supported_pids", %{supported_pids: pids})
+    {:noreply, socket}
+  end
+
+  def handle_in("elm_state", _params, socket) do
+    elm_state = Elm.Connector.get_state()
+    push(socket, "elm_state", %{elm_state: elm_state})
+    {:noreply, socket}
+  end
+  def handle_info({msg_type, data}, socket) do
+    push(socket, Atom.to_string(msg_type), data)
     {:noreply, socket}
   end
 end

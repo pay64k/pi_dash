@@ -40,13 +40,13 @@ defmodule Obd.PidWorker do
         )
 
         to_web = %{value: last_value, obd_pid: obd_pid_name, units: nil}
-        PiDashWeb.RoomChannel.send_to_channel(to_web)
+        PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
         {:noreply, state}
 
       {value, units} ->
         Logger.debug("obd pid worker #{obd_pid_name} translated data: #{inspect(value)} #{units}")
         to_web = %{value: value, obd_pid: obd_pid_name, units: units}
-        PiDashWeb.RoomChannel.send_to_channel(to_web)
+        PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
         {:noreply, %{state | last_value: value}}
     end
   end
