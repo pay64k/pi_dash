@@ -1,17 +1,25 @@
 import "../css/app.scss"
 
-import socket from "./socket"
-
 import "phoenix_html"
-
-var loadingioBar = require("loadingio-bar")
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import Dash from "./components/dash";
 import Clock from './components/clock'
 
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+      <Dash />
+      <Clock />
+      </div>
+    )
+  }
+}
+
 ReactDOM.render(
-    <Clock />,
-    document.getElementById('root')
-  );
+  <App/>,
+  document.getElementById("root")
+)

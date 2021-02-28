@@ -30,9 +30,6 @@ class Clock extends React.Component {
         </div>
       );
     }
-   fuck() {
-      console.log("fcuk")
-    }
   }
 
   export default Clock
