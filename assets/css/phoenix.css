@@ -28,6 +28,11 @@ select {
   width: auto;
 }
 
+/* hide loading bar labels */
+.ldBar-label {
+  font-size: 0.0em;
+}
+
 /* Phoenix promo and logo */
 .phx-hero {
   text-align: center;

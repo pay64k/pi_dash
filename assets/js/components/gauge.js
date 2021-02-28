@@ -16,8 +16,7 @@ class Gauge extends React.Component {
             if (message.obd_pid == this.props.name) {
                 console.log("update in gauge " + this.props.name, message)
                 document.getElementById(this.props.name).ldBar.set(message.value);
-                // bar1.set(message.value);
-                // this.setState({ value: message.value })
+                this.setState({ value: message.value })
             }
         });
     }
@@ -25,7 +24,7 @@ class Gauge extends React.Component {
     render() {
         return (
             <section className="row">
-
+                <h1>{this.state.value}</h1>
                 <div id={this.props.name}
                     className="ldBar"
                     data-value="50"
