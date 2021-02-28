@@ -36,6 +36,12 @@ defmodule Elm.Connector do
     GenStateMachine.call(__MODULE__, :get_supported_pids)
   end
 
+  def get_state() do
+    GenStateMachine.call(__MODULE__, :get_state)
+  end
+  # PiDashWeb.RoomChannel.send_to_channel(:status, %{status: :connected})
+
+
   def start_link() do
     GenStateMachine.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -78,6 +84,10 @@ defmodule Elm.Connector do
   def handle_event({:call, from}, :get_supported_pids, state, data) do
     res = data.supported_pids |> List.flatten() |> Enum.uniq()
     {:next_state, state, data, [{:reply, from, res}]}
+  end
+
+  def handle_event({:call, from}, :get_state, state, data) do
+    {:next_state, state, data, [{:reply, from, state}]}
   end
 
   def handle_event(:cast, :open_connection, :connect, data) do
