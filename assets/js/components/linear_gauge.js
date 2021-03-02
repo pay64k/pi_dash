@@ -1,6 +1,6 @@
 import React from "react";
 
-class NewGauge extends React.Component {
+class LinearGauge extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -58,4 +58,4 @@ class NewGauge extends React.Component {
     }
 }
 
-export default NewGauge
+export default LinearGauge

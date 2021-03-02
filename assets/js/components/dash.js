@@ -1,8 +1,7 @@
 import React from "react";
 
 import GridLayout from 'react-grid-layout';
-import Gauge from './gauge'
-import NewGauge from './new_gauge'
+import LinearGauge from './linear_gauge'
 
 class Dash extends React.Component {
   constructor(props) {
@@ -17,10 +16,10 @@ class Dash extends React.Component {
     return (
       <GridLayout className="layout" layout={layout} cols={12} rowHeight={100} width={1200}>
         <div key="b">
-          <NewGauge name="rpm" max_value={6500} channel={this.channel} />
+          <LinearGauge name="rpm" max_value={6500} channel={this.channel} />
         </div>
         <div key="c">
-          <NewGauge name="speed" max_value={200} channel={this.channel} />
+          <LinearGauge name="speed" max_value={200} channel={this.channel} />
         </div>
       </GridLayout>
     )
