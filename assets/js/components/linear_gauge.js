@@ -45,7 +45,7 @@ class LinearGauge extends React.Component {
             };
         const footerStyle = {
         width: "100%",
-        height: "80%"
+        height: "20%"
             };
         return (
             <div style={divStyle}>
