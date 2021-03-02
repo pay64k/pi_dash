@@ -23,7 +23,7 @@ class Gauge extends React.Component {
 
     render() {
         return (
-            <section className="row">
+            <div>
                 <h1>{this.state.value}</h1>
                 <div id={this.props.name}
                     className="ldBar"
@@ -35,7 +35,7 @@ class Gauge extends React.Component {
                     data-fill-dir="ltr"
                     data-duration={0.15}>
                 </div>
-            </section>)
+            </div>)
     }
 }
 
