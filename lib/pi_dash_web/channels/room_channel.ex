@@ -28,8 +28,10 @@ defmodule PiDashWeb.RoomChannel do
     push(socket, "elm_state", %{elm_state: elm_state})
     {:noreply, socket}
   end
-  def handle_info({msg_type, data}, socket) do
-    push(socket, Atom.to_string(msg_type), data)
+
+  def handle_info({msg_type = :update, data}, socket) do
+    topic = Atom.to_string(msg_type) <> ":" <> Atom.to_string(data.obd_pid_name)
+    push(socket, topic, data)
     {:noreply, socket}
   end
 end

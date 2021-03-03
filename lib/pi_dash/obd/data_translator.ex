@@ -16,11 +16,11 @@ defmodule Obd.DataTranslator do
     handle_data(obd_pid_name, data)
   end
 
-  def handle_data(:rpm, <<a, b, _crc>>), do: {(256 * a + b) / 4, "RPM"}
-  def handle_data(:rpm, <<a, b>>), do: {(256 * a + b) / 4, "RPM"}
+  def handle_data(:rpm, <<a, b, _crc>>), do: (256 * a + b) / 4
+  def handle_data(:rpm, <<a, b>>), do: (256 * a + b) / 4
   def handle_data(:rpm, <<_a>>), do: {:error, :malformed}
 
-  def handle_data(:speed, <<a, _crc>>), do: {a, "km/h"}
+  def handle_data(:speed, <<a, _crc>>), do: a
 
   def handle_data(_obd_pid, _data), do: {:error, :unhandled}
 
