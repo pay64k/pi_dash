@@ -10,6 +10,8 @@ import ReactDOM from 'react-dom'
 import Dash from "./components/dash";
 import Clock from './components/clock'
 
+import { Button } from 'react-bootstrap';
+
 class App extends React.Component {
   constructor() {
     super();
@@ -27,19 +29,28 @@ class App extends React.Component {
     this.channel.join()
       .receive("ok", response => { console.log("Joined successfully", response) })
       .receive("error", resp => { console.log("Unable to join", resp) })
+
+    this.channel.on("status:elm_state", (message) => {
+      console.log("got msg on status:", message)
+    });
+  }
+
+  askForStatus(channel) {
+    channel.push("status:elm_state", {})
   }
 
   render() {
     return (
       <div>
-      <Dash channel={this.channel}/>
-      <Clock />
+        <Dash channel={this.channel} />
+        <Button onClick={() => this.askForStatus(this.channel)} variant="outline-secondary" size="sm">ELM status</Button>{' '}
+        <Clock />
       </div>
     )
   }
 }
 
 ReactDOM.render(
-  <App/>,
+  <App />,
   document.getElementById("root")
 )

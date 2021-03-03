@@ -2,10 +2,12 @@
 // @import "./phoenix.css";
 @import "../node_modules/react-grid-layout/css/styles.css";
 @import "../node_modules/react-resizable/css/styles.css";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
 
 /* Alerts and form errors */
 body {
-  padding: 20px;
+  // padding: 20px;
+  font-size: small;
   font-family: monospace
 }
 #root {
