@@ -8,9 +8,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import Dash from "./components/dash";
-import Clock from './components/clock'
 
-import { Button } from 'react-bootstrap';
+import Footer from "./components/footer";
 
 class App extends React.Component {
   constructor() {
@@ -29,22 +28,13 @@ class App extends React.Component {
     this.channel.join()
       .receive("ok", response => { console.log("Joined successfully", response) })
       .receive("error", resp => { console.log("Unable to join", resp) })
-
-    this.channel.on("status:elm_state", (message) => {
-      console.log("got msg on status:", message)
-    });
-  }
-
-  askForStatus(channel) {
-    channel.push("status:elm_state", {})
   }
 
   render() {
     return (
       <div>
         <Dash channel={this.channel} />
-        <Button onClick={() => this.askForStatus(this.channel)} variant="outline-secondary" size="sm">ELM status</Button>{' '}
-        <Clock />
+        <Footer channel={this.channel}/>
       </div>
     )
   }
