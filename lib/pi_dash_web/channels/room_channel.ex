@@ -23,10 +23,9 @@ defmodule PiDashWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in("status:elm_state", _params, socket) do
-    Logger.info("recevied mesg on elm_state")
-    elm_state = Elm.Connector.get_state()
-    push(socket, "status:elm_state", %{elm_state: elm_state})
+  def handle_in("status:elm_status", _params, socket) do
+    elm_status = Elm.Connector.get_state()
+    push(socket, "status:elm_status", %{elm_status: elm_status})
     {:noreply, socket}
   end
 
