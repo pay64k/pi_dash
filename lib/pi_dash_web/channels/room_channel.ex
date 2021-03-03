@@ -29,9 +29,9 @@ defmodule PiDashWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_info({msg_type = :update, data}, socket) do
-    topic = Atom.to_string(msg_type) <> ":" <> Atom.to_string(data.obd_pid_name)
-    push(socket, topic, data)
+  def handle_info({msg_type = :update, %{obd_pid_name: name, value: value}}, socket) do
+    topic = Atom.to_string(msg_type) <> ":" <> Atom.to_string(name)
+    push(socket, topic, %{value: value})
     {:noreply, socket}
   end
 end
