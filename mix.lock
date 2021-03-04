@@ -12,6 +12,7 @@
   "gettext": {:hex, :gettext, "0.18.2", "7df3ea191bb56c0309c00a783334b288d08a879f53a7014341284635850a6e55", [:mix], [], "hexpm", "f9f537b13d4fdd30f3039d33cb80144c3aa1f8d9698e47d7bcbcc8df93b1f5c5"},
   "jason": {:hex, :jason, "1.2.2", "ba43e3f2709fd1aa1dce90aaabfd039d000469c05c56f0b8e31978e03fa39052", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "18a228f5f0058ee183f29f9eae0805c6e59d61c3b006760668d8d18ff0d12179"},
   "logger_file_backend": {:hex, :logger_file_backend, "0.0.11", "3bbc5f31d3669e8d09d7a9443e86056fae7fc18e45c6f748c33b8c79a7e147a1", [:mix], [], "hexpm", "62be826f04644c62b0a2bc98a13e2e7ae52c0a4eda020f4c59d7287356d5e445"},
+  "loggix": {:hex, :loggix, "0.0.9", "27ac388bd0b0ac23b110a075be353559258b201dcb0abbf75cc83ce6019ccdea", [:mix], [], "hexpm", "184433129452efda7af06d3a8c96d1d7e1146cc6373fa30e0d41f0b7b4860bf4"},
   "meck": {:hex, :meck, "0.8.13", "ffedb39f99b0b99703b8601c6f17c7f76313ee12de6b646e671e3188401f7866", [:rebar3], [], "hexpm", "d34f013c156db51ad57cc556891b9720e6a1c1df5fe2e15af999c84d6cebeb1a"},
   "mime": {:hex, :mime, "1.5.0", "203ef35ef3389aae6d361918bf3f952fa17a09e8e43b5aa592b93eba05d0fb8d", [:mix], [], "hexpm", "55a94c0f552249fc1a3dd9cd2d3ab9de9d3c89b559c2bd01121f824834f24746"},
   "nerves_uart": {:hex, :nerves_uart, "1.2.1", "ae3247e14915f79dde7d4f450ad4c0d4bdc7ab505e3d7c4d4799ac1121e0b505", [:mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "510e400be82fcda486bb48d8026534f84f8e57b4cd27d76772175ef599debd54"},

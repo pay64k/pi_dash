@@ -20,6 +20,12 @@ https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with
 
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-http://www.lcdwiki.com/7inch_HDMI_Display-B
+https://www.pi-shop.ch/5-inch-capacitive-touch-screen-800x480-hdmi-monitor-tft-lcd-display-fuer-raspberry-pi
+framebuffer_width=800 
+framebuffer_height=480 
+hdmi_force_hotplug=1 
+hdmi_group=2 
+hdmi_mode=87 
+hdmi_cvt  800  480  60  6  0  0  0 
 
 add react to phoenix https://dewetblomerus.com/2018/11/30/react-on-phoenix-1-4.html
