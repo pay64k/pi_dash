@@ -22,7 +22,7 @@ class LinearGauge extends React.Component {
     }
 
     calculateWidth(value, canvas) {
-        return value * canvas.width / this.props.max_value;
+        return Math.floor(value * canvas.width / this.props.max_value);
         // (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
