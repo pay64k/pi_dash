@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: rpi4
     steps:
       - uses: actions/checkout@v2
       - name: Run a one-line script
