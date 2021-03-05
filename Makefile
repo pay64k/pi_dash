@@ -10,6 +10,12 @@ release:
 	npm run deploy --prefix ./assets
 	mix release pi_dash
 
+install:
+	mkdir -p ~/pi_dash || true
+	mv _build/prod/pi_dash-0.1.0.tar.gz ~/pi_dash
+	cd ~/pi_dash && \
+	tar -xvf pi_dash-0.1.0.tar.gz
+
 .PHONY: test_mode
 test_mode:
 	TEST_MODE=true iex -S mix phx.server
