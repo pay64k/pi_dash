@@ -1,5 +1,4 @@
-[![build](https://github.com/pay64k/pi_dash/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pay64k/pi_dash/actions/workflows/build.yml)
-
+[![build_on_rpi4](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml)
 https://www.csselectronics.com/screen/page/simple-intro-obd2-explained/language/en, "Raw OBD2 frame details" chapter
 
 OBD codes: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01
