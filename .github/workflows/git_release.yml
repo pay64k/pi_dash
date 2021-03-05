@@ -12,7 +12,7 @@ jobs:
       - name: build
         run: make
 
-      - name: Archive code coverage results
+      - name: Archive tar
         uses: actions/upload-artifact@v2
         with:
           name: pi_dash.tar.gz
