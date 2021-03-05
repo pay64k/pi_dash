@@ -11,8 +11,9 @@ release:
 	mix release pi_dash
 
 install:
-	mkdir -p ~/pi_dash || true
-	mv _build/prod/pi_dash-0.1.0.tar.gz ~/pi_dash
+	rm -rf ~/pi_dash || true
+	mkdir -p ~/pi_dash 
+	cp _build/prod/pi_dash-0.1.0.tar.gz ~/pi_dash
 	cd ~/pi_dash && \
 	tar -xvf pi_dash-0.1.0.tar.gz
 
