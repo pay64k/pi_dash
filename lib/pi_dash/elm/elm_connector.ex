@@ -39,8 +39,8 @@ defmodule Elm.Connector do
   def get_state() do
     GenStateMachine.call(__MODULE__, :get_state)
   end
-  # PiDashWeb.RoomChannel.send_to_channel(:status, %{status: :connected})
 
+  # PiDashWeb.RoomChannel.send_to_channel(:status, %{status: :connected})
 
   def start_link() do
     GenStateMachine.start_link(__MODULE__, [], name: __MODULE__)
@@ -150,28 +150,50 @@ defmodule Elm.Connector do
         GenStateMachine.cast(__MODULE__, :open_connection)
         {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
 
-      data.last_sent_command in @obd_pids_supported and
-          Enum.count(data.elm_queue) > 0 ->
-        supported = Obd.DataTranslator.parse_supported_pids(msg)
-        Logger.info("Supported PIDs: #{inspect(supported)}")
-        {to_send, rest} = List.pop_at(data.elm_queue, 0)
-        write_command(to_send)
+      data.last_sent_command in @obd_pids_supported ->
+        {msg_is_data?, more_to_send?} =
+          {!String.contains?(msg, "NO_DATA"), Enum.count(data.elm_queue) > 0}
 
-        {:next_state, :get_supported_pids,
-         %Data{
-           data
-           | supported_pids: data.supported_pids ++ supported,
-             last_sent_command: to_send,
-             elm_queue: rest
-         }}
+        case {msg_is_data?, more_to_send?} do
+          {false, true} ->
+            Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
+            {to_send, rest} = List.pop_at(data.elm_queue, 0)
+            write_command(to_send)
 
-      Enum.count(data.elm_queue) == 0 ->
-        supported = Obd.DataTranslator.parse_supported_pids(msg)
-        Logger.info("Supported PIDs: #{inspect(supported)}")
-        start_pid_sup()
+            {:next_state, :get_supported_pids,
+             %Data{data | last_sent_command: to_send, elm_queue: rest}}
 
-        {:next_state, :connected_configured,
-         %Data{data | supported_pids: data.supported_pids ++ [supported]}}
+          {false, false} ->
+            Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
+            start_pid_sup()
+            {:next_state, :connected_configured, data}
+
+          {true, true} ->
+            supported = Obd.DataTranslator.parse_supported_pids(msg)
+            Logger.info("Supported PIDs: #{inspect(supported)}")
+            {to_send, rest} = List.pop_at(data.elm_queue, 0)
+            write_command(to_send)
+
+            {:next_state, :get_supported_pids,
+             %Data{
+               data
+               | supported_pids: data.supported_pids ++ supported,
+                 last_sent_command: to_send,
+                 elm_queue: rest
+             }}
+
+          {true, false} ->
+            supported = Obd.DataTranslator.parse_supported_pids(msg)
+            Logger.info("Supported PIDs: #{inspect(supported)}")
+            start_pid_sup()
+
+            {
+              :next_state,
+              :connected_configured,
+              # TODO store supported pids with mode e.g 01 01
+              %Data{data | supported_pids: data.supported_pids ++ [supported]}
+            }
+        end
     end
   end
 
