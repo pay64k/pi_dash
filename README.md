@@ -28,4 +28,18 @@ hdmi_group=2
 hdmi_mode=87 
 hdmi_cvt  800  480  60  6  0  0  0 
 
+https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup
+https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup
+install lightdm
+change raspi-config to autologin to dektop
+
+https://asdf-vm.com/#/core-manage-asdf
+https://github.com/asdf-vm/asdf-erlang
+    sudo apt-get install -y libssl-dev libncurses5-dev
+https://github.com/asdf-vm/asdf-elixirasdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+https://github.com/asdf-vm/asdf-nodejs
+
+install hex
+mix local.rebar --force
+
 add react to phoenix https://dewetblomerus.com/2018/11/30/react-on-phoenix-1-4.html
