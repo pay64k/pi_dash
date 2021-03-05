@@ -151,10 +151,10 @@ defmodule Elm.Connector do
         {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
 
       data.last_sent_command in @obd_pids_supported ->
-        {msg_is_data?, more_to_send?} =
-          {!String.contains?(msg, "NO_DATA"), Enum.count(data.elm_queue) > 0}
+        next = {!String.contains?(msg, "NO DATA"), Enum.count(data.elm_queue) > 0}
+        Logger.debug(":get_suuported_pids {next}: #{inspect(next)}")
 
-        case {msg_is_data?, more_to_send?} do
+        case next do
           {false, true} ->
             Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
             {to_send, rest} = List.pop_at(data.elm_queue, 0)
