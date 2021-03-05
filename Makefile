@@ -2,7 +2,7 @@ export base_image_rpi4=docker.io/arm64v8/alpine:3.13.2
 
 export DOCKER_USER=pay64k
 export DOCKER_CLI_EXPERIMENTAL=enabled
-# export MIX_ENV=prod
+export MIX_ENV=prod
 
 release:
 	mix deps.get
