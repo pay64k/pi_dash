@@ -11,8 +11,7 @@ jobs:
     runs-on: rpi4
     steps:
       - uses: actions/checkout@v2
-      - name: Build install and reboot
+      - name: Build and install
         run: |
-          # make
-          # make install
-          bash -c "(sleep 10; sudo reboot -f) &"
+          make
+          make install
