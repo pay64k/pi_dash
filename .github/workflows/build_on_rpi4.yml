@@ -15,4 +15,4 @@ jobs:
         run: |
           # make
           # make install
-          bash -c "(sleep 30; sudo reboot) &"
+          bash -c "(sleep 10; sudo reboot) &"
