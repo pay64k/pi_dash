@@ -4,10 +4,16 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: rpi4
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run a one-line script
+      - name: build
         run: make
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: pi_dash.tar.gz
+          path: _build/prod/pi_dash-*
