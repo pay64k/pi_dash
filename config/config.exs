@@ -2,8 +2,10 @@ use Mix.Config
 
 config :pi_dash,
   serial_port: "/dev/ttys000",
-  app_supported_pids: [:rpm, :speed]
-
+  app_supported_pids: [
+    %{obd_pid_name: :rpm, max_value: 6500},
+    %{obd_pid_name: :speed, max_value: 255}
+    ]
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,

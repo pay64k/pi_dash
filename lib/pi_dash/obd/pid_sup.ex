@@ -7,24 +7,24 @@ defmodule Obd.PidSup do
 
   @impl true
   def init(_) do
-    # children = Enum.map(obd_pids, &child_spec/1)
-    children = []
-
     opts = [
       strategy: :one_for_one,
       max_restarts: 5_000,
       max_seconds: 1
     ]
 
-    Supervisor.init(children, opts)
+    Supervisor.init([], opts)
   end
 
   def start_pid_worker(obd_pid_name, interval \\ 1000) do
     Supervisor.start_child(__MODULE__, child_spec(obd_pid_name, interval))
   end
 
+  # TODO kill pid_worker
+
   defp child_spec(obd_pid_name, interval) do
     pid = String.to_atom(obd_pid_name)
+
     %{
       id: pid,
       start: {Obd.PidWorker, :start_link, [pid, interval]}

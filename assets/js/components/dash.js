@@ -13,7 +13,7 @@ class Dash extends React.Component {
     this.channel = props.channel;
     this.state = {
       layouts: JSON.parse(JSON.stringify(originalLayouts)),
-      pids: props.pids
+      active_pids: props.active_pids
     }
   }
 
@@ -24,8 +24,8 @@ class Dash extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log("dash updated", prevProps)
-    if (this.props.pids !== prevProps.pids) {
-      this.setState({ pids: prevProps.pids });
+    if (this.props.active_pids !== prevProps.active_pids) {
+      this.setState({ active_pids: prevProps.active_pids });
       console.log("props: ", this.props)
       console.log("prevProps: ", prevProps)
     }
@@ -43,10 +43,9 @@ class Dash extends React.Component {
           this.onLayoutChange(layout, layouts)
         }
       >
-        {this.state.pids.map((pid) => (
-          // TODO get max value here
-          <div key={pid} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
-            <LinearGauge name={pid} max_value={6500} channel={this.channel} />
+        {this.state.active_pids.map((pid) => (
+          <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
+            <LinearGauge name={pid.obd_pid_name} max_value={pid.max_value} channel={this.channel} />
           </div>
         ))}
       </ResponsiveReactGridLayout>

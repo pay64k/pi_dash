@@ -50,8 +50,8 @@ class Controller extends React.Component {
   }
 
   start_pid_worker(pid) {
-    console.log("start pid worker ", pid)
-    this.pushOnChannel("status:start_pid_worker", { "pid_name": pid })
+    console.log("start pid worker ", pid.obd_pid_name)
+    this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
     this.state.active_pids.push(pid)
 
   }
@@ -59,7 +59,7 @@ class Controller extends React.Component {
   render() {
     return (
       <div>
-        <Dash channel={this.channel} pids={this.state.active_pids} />
+        <Dash channel={this.channel} active_pids={this.state.active_pids} />
         <footer className="bg-light text-center text-lg-start">
           <div className="container">
             <div className="row row-30">
@@ -78,10 +78,10 @@ class Controller extends React.Component {
                   >
                     {this.state.supported_pids.map((pid) => (
                       <Dropdown.Item
-                        key={pid}
-                        eventKey={pid}
+                        key={pid.obd_pid_name}
+                        eventKey={pid.obd_pid_name}
                         onClick={() => this.start_pid_worker(pid)}
-                      >{pid}</Dropdown.Item>
+                      >{pid.obd_pid_name}</Dropdown.Item>
                     ))}
                   </DropdownButton>
                 </div>
