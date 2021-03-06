@@ -2,13 +2,16 @@ import React from 'react'
 import { Button, DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
 import Clock from './clock'
 
+import Dash from "./dash";
+
 class Controller extends React.Component {
   constructor(props) {
     super(props);
     this.channel = this.props.channel;
     this.state = {
       elm_status: "unknown",
-      supported_pids: []
+      supported_pids: [],
+      active_pids: []
     };
   }
 
@@ -42,50 +45,55 @@ class Controller extends React.Component {
   }
 
   pushOnChannel(msg, body) {
-    if(body == null) {body = {}}
+    if (body == null) { body = {} }
     this.channel.push(msg, body)
   }
 
   start_pid_worker(pid) {
     console.log("start pid worker ", pid)
-    this.pushOnChannel("status:start_pid_worker", {"pid_name": pid})
+    this.pushOnChannel("status:start_pid_worker", { "pid_name": pid })
+    this.state.active_pids.push(pid)
+
   }
 
   render() {
     return (
-      <footer className="bg-light text-center text-lg-start">
-        <div className="container">
-          <div className="row row-30">
-            <div className="col-md-4">
-              <h4>{this.state.elm_status}</h4>
-            </div>
-            <div className="col-md-4">
-              <div className="mb-2">
-                <DropdownButton
-                  as={ButtonGroup}
-                  key="dropdown"
-                  id="pids_dropdown"
-                  drop="up"
-                  variant="secondary"
-                  title="PIDS"
-                >
-                  {this.state.supported_pids.map((pid) => (
-                    <Dropdown.Item
-                      key={pid}
-                      eventKey={pid}
-                      onClick={() => this.start_pid_worker(pid)}
-                    >{pid}</Dropdown.Item>
-                  ))}
-                </DropdownButton>
+      <div>
+        <Dash channel={this.channel} pids={this.state.active_pids} />
+        <footer className="bg-light text-center text-lg-start">
+          <div className="container">
+            <div className="row row-30">
+              <div className="col-md-4">
+                <h4>{this.state.elm_status}</h4>
+              </div>
+              <div className="col-md-4">
+                <div className="mb-2">
+                  <DropdownButton
+                    as={ButtonGroup}
+                    key="dropdown"
+                    id="pids_dropdown"
+                    drop="up"
+                    variant="secondary"
+                    title="PIDS"
+                  >
+                    {this.state.supported_pids.map((pid) => (
+                      <Dropdown.Item
+                        key={pid}
+                        eventKey={pid}
+                        onClick={() => this.start_pid_worker(pid)}
+                      >{pid}</Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <Clock />
               </div>
             </div>
-            <div className="col-md-4">
-              <Clock />
-            </div>
           </div>
-        </div>
-        {/* <Button onClick={() => this.askForStatus(this.channel)} variant="outline-secondary" size="sm">PIDs</Button>{' '} */}
-      </footer>
+          {/* <Button onClick={() => this.askForStatus(this.channel)} variant="outline-secondary" size="sm">PIDs</Button>{' '} */}
+        </footer>
+      </div>
     );
   }
 }

@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :pi_dash,
-  serial_port: "/dev/ttys002"
+  serial_port: "/dev/ttys000"
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,
@@ -14,8 +14,8 @@ config :pi_dash, PiDashWeb.Endpoint,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  level: :info,
-  # level: :debug,
+  # level: :info,
+  level: :debug,
   metadata: [:request_id]
 
 # Use Jason for JSON parsing in Phoenix

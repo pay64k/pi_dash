@@ -7,8 +7,6 @@ import { Socket } from "phoenix";
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Dash from "./components/dash";
-
 import Controller from "./components/controller";
 
 class App extends React.Component {
@@ -33,7 +31,6 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Dash channel={this.channel} />
         <Controller channel={this.channel}/>
       </div>
     )
