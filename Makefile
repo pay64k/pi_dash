@@ -19,7 +19,7 @@ install:
 
 .PHONY: test_mode
 test_mode:
-	TEST_MODE=true iex -S mix phx.server
+	MIX_ENV=dev TEST_MODE=true iex -S mix phx.server
 
 .PHONY: docker_rpi4
 docker_rpi4:
