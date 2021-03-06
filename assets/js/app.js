@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 
 import Dash from "./components/dash";
 
-import Footer from "./components/footer";
+import Controller from "./components/footer";
 
 class App extends React.Component {
   constructor() {
@@ -34,7 +34,7 @@ class App extends React.Component {
     return (
       <div>
         <Dash channel={this.channel} />
-        <Footer channel={this.channel}/>
+        <Controller channel={this.channel}/>
       </div>
     )
   }

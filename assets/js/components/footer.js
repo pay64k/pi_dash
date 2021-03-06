@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, DropdownButton, Dropdown, ButtonGroup} from 'react-bootstrap';
 import Clock from './clock'
 
-class Footer extends React.Component {
+class Controller extends React.Component {
   constructor(props) {
     super(props);
     this.channel = this.props.channel;
@@ -83,4 +83,4 @@ class Footer extends React.Component {
   }
 }
 
-export default Footer
+export default Controller
