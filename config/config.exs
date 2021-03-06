@@ -14,8 +14,8 @@ config :pi_dash, PiDashWeb.Endpoint,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  # level: :info,
-  level: :debug,
+  level: :info,
+  # level: :debug,
   metadata: [:request_id]
 
 # Use Jason for JSON parsing in Phoenix
@@ -27,8 +27,8 @@ config :logger,
 
 config :logger, :logger_file_backend,
   path: "./pi_dash.log",
-  # level: :info,
-  level: :debug,
+  level: :info,
+  # level: :debug,
   rotate: %{max_bytes: 1048576, keep: 5},
   format: "\n$date $time [$level] $metadata $message",
   metadata: [:pid, :module, :function, :line]

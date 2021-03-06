@@ -347,7 +347,7 @@ defmodule Elm.Connector do
     child = [
       %{
         id: Obd.PidSup,
-        start: {Obd.PidSup, :start_link, [PiDash.Application.pids_to_monitor()]}
+        start: {Obd.PidSup, :start_link, []}
       }
     ]
 
