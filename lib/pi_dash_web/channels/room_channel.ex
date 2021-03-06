@@ -22,6 +22,7 @@ defmodule PiDashWeb.RoomChannel do
     pids =
       Elm.Connector.get_supported_pids()
       |> from_pid_to_name()
+      |> filter_pids()
 
     push(socket, "status:supported_pids", %{supported_pids: pids})
     {:noreply, socket}
@@ -47,5 +48,13 @@ defmodule PiDashWeb.RoomChannel do
 
   defp from_pid_to_name(list) do
     for pid <- list, do: Obd.PidTranslator.pid_to_name(pid)
+  end
+
+  defp filter_pids(supported_pids) do
+    MapSet.intersection(
+      MapSet.new(supported_pids),
+      MapSet.new(Application.fetch_env!(:pi_dash, :app_supported_pids))
+    )
+    |> MapSet.to_list()
   end
 end
