@@ -19,10 +19,15 @@ defmodule Obd.PidSup do
     Supervisor.init(children, opts)
   end
 
-  # defp child_spec(%{obd_pid_name: obd_pid_name, interval: interval}) do
-  #   %{
-  #     id: obd_pid_name,
-  #     start: {Obd.PidWorker, :start_link, [obd_pid_name, interval]}
-  #   }
-  # end
+  def start_pid_worker(obd_pid_name, interval \\ 1000) do
+    Supervisor.start_child(__MODULE__, child_spec(obd_pid_name, interval))
+  end
+
+  defp child_spec(obd_pid_name, interval) do
+    pid = String.to_atom(obd_pid_name)
+    %{
+      id: pid,
+      start: {Obd.PidWorker, :start_link, [pid, interval]}
+    }
+  end
 end
