@@ -1,6 +1,7 @@
 defmodule PiDashWeb.RoomChannel do
   use PiDashWeb, :channel
   require Logger
+
   def send_to_channel(msg_type, data) do
     Phoenix.PubSub.broadcast(
       PiDash.PubSub,
@@ -17,9 +18,12 @@ defmodule PiDashWeb.RoomChannel do
     GenServer.cast(__MODULE__, {:send, data})
   end
 
-  def handle_in("supported_pids", _params, socket) do
-    pids = [:speed, :rpm]
-    push(socket, "supported_pids", %{supported_pids: pids})
+  def handle_in("status:supported_pids", _params, socket) do
+    pids =
+      Elm.Connector.get_supported_pids()
+      |> from_pid_to_name()
+
+    push(socket, "status:supported_pids", %{supported_pids: pids})
     {:noreply, socket}
   end
 
@@ -33,5 +37,9 @@ defmodule PiDashWeb.RoomChannel do
     topic = Atom.to_string(msg_type) <> ":" <> Atom.to_string(name)
     push(socket, topic, %{value: value})
     {:noreply, socket}
+  end
+
+  defp from_pid_to_name(list) do
+    for pid <- list, do: Obd.PidTranslator.pid_to_name(pid)
   end
 end
