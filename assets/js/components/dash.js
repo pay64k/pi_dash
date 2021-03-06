@@ -23,15 +23,13 @@ class Dash extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log("dash updated", prevProps)
     if (this.props.active_pids !== prevProps.active_pids) {
       this.setState({ active_pids: prevProps.active_pids });
-      console.log("props: ", this.props)
-      console.log("prevProps: ", prevProps)
     }
 
   }
-
+// TODO pick gauge type: linear, circle etc
+// TODO pick up refresh interval
   render() {
     return (
       <ResponsiveReactGridLayout
