@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, DropdownButton, Dropdown, ButtonGroup} from 'react-bootstrap';
+import { Button, DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
 import Clock from './clock'
 
 class Controller extends React.Component {
@@ -41,11 +41,14 @@ class Controller extends React.Component {
     clearInterval(this.timerID);
   }
 
-  pushOnChannel(msg) {
-    this.channel.push(msg, {})
+  pushOnChannel(msg, body) {
+    if(body == null) {body = {}}
+    this.channel.push(msg, body)
   }
 
-  askForStatus() {
+  start_pid_worker(pid) {
+    console.log("start pid worker ", pid)
+    this.pushOnChannel("status:start_pid_worker", {"pid_name": pid})
   }
 
   render() {
@@ -67,7 +70,11 @@ class Controller extends React.Component {
                   title="PIDS"
                 >
                   {this.state.supported_pids.map((pid) => (
-                    <Dropdown.Item key={pid} eventKey={pid}>{pid}</Dropdown.Item>
+                    <Dropdown.Item
+                      key={pid}
+                      eventKey={pid}
+                      onClick={() => this.start_pid_worker(pid)}
+                    >{pid}</Dropdown.Item>
                   ))}
                 </DropdownButton>
               </div>

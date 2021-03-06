@@ -28,8 +28,9 @@ defmodule PiDashWeb.RoomChannel do
   end
 
   # TODO: send interval from another dropdown in GUI
-  def handle_in("status:start_pid_worker", %{pid_name: pid_name}, _socket) do
+  def handle_in("status:start_pid_worker", %{"pid_name" => pid_name}, socket) do
     Obd.PidSup.start_pid_worker(pid_name, 1000)
+    {:noreply, socket}
   end
 
   def handle_in("status:elm_status", _params, socket) do
