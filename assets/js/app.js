@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 
 import Dash from "./components/dash";
 
-import Controller from "./components/footer";
+import Controller from "./components/controller";
 
 class App extends React.Component {
   constructor() {
