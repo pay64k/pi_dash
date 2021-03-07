@@ -25,7 +25,6 @@ class Controller extends React.Component {
 
     this.channel.on("status:elm_status", (message) => {
       if (message.elm_status == "connected_configured" && this.state.elm_status != "connected_configured") {
-        console.log("conn conf")
         this.state.active_pids.map((pid) =>
           this.maybe_start_pid_worker(pid)
         )
@@ -54,26 +53,19 @@ class Controller extends React.Component {
   }
 
   maybe_start_pid_worker(pid) {
-    var newArray = [...this.state.active_pids]
-    var indexItem = newArray.indexOf(pid)
-    if(indexItem === -1){
-      console.log("start pid worker ", pid.obd_pid_name)
-      this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
-      newArray.push(pid)
-      saveToLS("active_pids", newArray)
-      this.setState({ active_pids: newArray })
-    }
-    // console.log("start pid worker ", pid.obd_pid_name)
-    // this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
-    // saveToLS("active_pids", this.state.active_pids)
-  }
+    var exists = false
+    this.state.active_pids.forEach(el => {
+      if (el.obd_pid_name == pid.obd_pid_name) {
+        exists = true
+      }
+    })
 
-  // add_to_active_pids(pid) {
-  //   var newArray = [...this.state.active_pids]
-  //   var indexItem = newArray.indexOf(pid)
-  //   indexItem === -1 ? newArray.push(item) : console.log("exists")
-  //   this.setState({ active_pids: newArray });
-  // }
+    if (!exists) {
+      this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
+      this.state.active_pids.push(pid)
+      saveToLS("active_pids", this.state.active_pids)
+    }
+  }
 
   render() {
     return (
@@ -100,7 +92,6 @@ class Controller extends React.Component {
                         key={pid.obd_pid_name}
                         eventKey={pid.obd_pid_name}
                         onClick={() => {
-                          // this.add_to_active_pids(pid);
                           this.maybe_start_pid_worker(pid)
                         }
                         }
