@@ -13,8 +13,12 @@ class Controller extends React.Component {
     this.state = {
       elm_status: "unknown",
       supported_pids: [],
-      active_pids: JSON.parse(JSON.stringify(active_pids)),
+      active_pids: JSON.parse(JSON.stringify(active_pids))
     };
+  }
+
+  parse_and_set_ls_to_false(ap) {
+
   }
 
   componentDidMount() {
@@ -54,14 +58,24 @@ class Controller extends React.Component {
 
   maybe_start_pid_worker(pid) {
     var exists = false
+    var started = false
     this.state.active_pids.forEach(el => {
       if (el.obd_pid_name == pid.obd_pid_name) {
         exists = true
+        if (el.started == false) {
+          started = false
+        }
       }
     })
-
-    if (!exists) {
+    if(exists && !started) {
       this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
+      pid["started"] = true
+      saveToLS("active_pids", this.state.active_pids)
+    }
+
+    if (!exists && !started) {
+      this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
+      pid["started"] = true
       this.state.active_pids.push(pid)
       saveToLS("active_pids", this.state.active_pids)
     }
@@ -122,7 +136,14 @@ function getFromLS(key) {
       /*Ignore*/
     }
   }
-  return ls[key];
+  if(ls[key] == null){
+    return [];
+  }
+  let pids = ls[key]
+  if(pids.length > 0) {
+    pids.forEach( el => el.started = false)
+  }
+  return pids;
 }
 
 function saveToLS(key, value) {
