@@ -67,18 +67,17 @@ class Controller extends React.Component {
         }
       }
     })
-    if(exists && !started) {
-      this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
-      pid["started"] = true
-      saveToLS("active_pids", this.state.active_pids)
+
+    if (!exists) {
+      this.state.active_pids.push(pid)
     }
 
-    if (!exists && !started) {
+    if (!started) {
       this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
       pid["started"] = true
-      this.state.active_pids.push(pid)
-      saveToLS("active_pids", this.state.active_pids)
     }
+
+    saveToLS("active_pids", this.state.active_pids)
   }
 
   render() {
@@ -136,14 +135,13 @@ function getFromLS(key) {
       /*Ignore*/
     }
   }
-  if(ls[key] == null){
+  if (ls[key] == null) {
     return [];
   }
-  let pids = ls[key]
-  if(pids.length > 0) {
-    pids.forEach( el => el.started = false)
+  if (ls[key].length > 0) {
+    ls[key].forEach(el => el.started = false)
   }
-  return pids;
+  return ls[key];
 }
 
 function saveToLS(key, value) {
