@@ -83,10 +83,11 @@ defmodule Elm.Connector do
 
   def handle_event({:call, from}, :get_supported_pids, state, data) do
     res =
-      if System.get_env("TEST_MODE"),
-        do: ["0C", "0D", "03", "04"],
-        else: data.supported_pids |> List.flatten() |> Enum.uniq()
-
+      if System.get_env("TEST_MODE") do
+        for %{hex: h} <- Application.fetch_env!(:pi_dash, :app_supported_pids), do: h
+        else
+           data.supported_pids |> List.flatten() |> Enum.uniq()
+        end
     {:next_state, state, data, [{:reply, from, res}]}
   end
 

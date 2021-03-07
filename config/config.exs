@@ -3,9 +3,15 @@ use Mix.Config
 config :pi_dash,
   serial_port: "/dev/ttys000",
   app_supported_pids: [
-    %{obd_pid_name: :rpm, max_value: 6500},
-    %{obd_pid_name: :speed, max_value: 255}
-    ]
+    %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100},
+    %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},
+    %{hex: "0C", obd_pid_name: :speed, min_value: 0, max_value: 255},
+    %{hex: "0D", obd_pid_name: :rpm, min_value: 0, max_value: 6500, },
+    %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215}
+
+    # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
+    # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
+  ]
 
 # Configures the endpoint
 config :pi_dash, PiDashWeb.Endpoint,
@@ -33,7 +39,7 @@ config :logger, :logger_file_backend,
   path: "./pi_dash.log",
   level: :info,
   # level: :debug,
-  rotate: %{max_bytes: 1048576, keep: 5},
+  rotate: %{max_bytes: 1_048_576, keep: 5},
   format: "\n$date $time [$level] $metadata $message",
   metadata: [:pid, :module, :function, :line]
 
