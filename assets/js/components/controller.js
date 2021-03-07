@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
 import Clock from './clock'
-
+import Interval from './interval'
 import Dash from "./dash";
 
 const active_pids = getFromLS("active_pids") || [];
@@ -13,12 +13,9 @@ class Controller extends React.Component {
     this.state = {
       elm_status: "unknown",
       supported_pids: [],
-      active_pids: JSON.parse(JSON.stringify(active_pids))
+      active_pids: JSON.parse(JSON.stringify(active_pids)),
+      active_interval: 1000
     };
-  }
-
-  parse_and_set_ls_to_false(ap) {
-
   }
 
   componentDidMount() {
@@ -38,6 +35,7 @@ class Controller extends React.Component {
       this.setState({
         elm_status: message.elm_status
       });
+      console.log(this.state)
     });
 
     this.channel.on("status:supported_pids", (message) => {
@@ -80,6 +78,10 @@ class Controller extends React.Component {
     saveToLS("active_pids", this.state.active_pids)
   }
 
+  update_active_interval = (new_interval) => {
+    this.setState({ active_interval: new_interval });
+  }
+
   render() {
     return (
       <div>
@@ -87,14 +89,17 @@ class Controller extends React.Component {
         <footer className="bg-light text-center text-lg-start">
           <div className="container">
             <div className="row row-30">
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <h4>{this.state.elm_status}</h4>
               </div>
-              <div className="col-md-4">
+              <div className="col-md-3">
+                <Interval active_interval_cb={this.update_active_interval} />
+              </div>
+              <div className="col-md-3">
                 <div className="mb-2">
                   <DropdownButton
                     as={ButtonGroup}
-                    key="dropdown"
+                    key="pids_dropdown"
                     id="pids_dropdown"
                     drop="up"
                     variant="secondary"
@@ -114,7 +119,7 @@ class Controller extends React.Component {
                   </DropdownButton>
                 </div>
               </div>
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <Clock />
               </div>
             </div>
