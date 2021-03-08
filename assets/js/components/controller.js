@@ -67,11 +67,13 @@ class Controller extends React.Component {
     })
 
     if (!exists) {
+      pid["interval"] = this.state.active_interval
       this.state.active_pids.push(pid)
     }
 
     if (!started) {
-      this.pushOnChannel("status:start_pid_worker", { "pid_name": pid.obd_pid_name })
+      this.pushOnChannel("status:start_pid_worker", 
+        { "pid_name": pid.obd_pid_name, "interval": pid.interval })
       pid["started"] = true
     }
 

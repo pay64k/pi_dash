@@ -2,44 +2,51 @@ import React from 'react'
 import { DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
 
 const intervals = [250, 500, 1000, 2000, 5000]
-const def_inter = 1000
 
 class Interval extends React.Component {
     constructor(props) {
         super(props);
-    }
-
-    componentDidMount() {
-        // console.log("active interval: ", this.state.active_interval)
-    }
-
-    show_state() {
-        console.log(this.state)
+        this.state = {
+            active: 1000
+        }
     }
 
     update_interval(new_interval) {
         this.props.active_interval_cb(new_interval)
+        this.setState({
+            active: new_interval
+        })
     }
 
     render() {
+        let items = intervals.map((i) => {
+            if (i == this.state.active) {
+                return (<Dropdown.Item
+                    key={i}
+                    eventKey={i}
+                    active
+                    onClick={() => this.update_interval(i)}
+                >{i} ms
+                </Dropdown.Item>)
+            }
+            else {
+                return (<Dropdown.Item
+                    key={i}
+                    eventKey={i}
+                    onClick={() => this.update_interval(i)}
+                >{i} ms
+                </Dropdown.Item>)
+            }
+        });
         return (
             <DropdownButton
                 as={ButtonGroup}
                 key="interval_dropdown"
                 id="interval_dropdown"
                 variant="secondary"
-                title="Interval"
+                title={`${this.state.active} ms`}
             >
-                {intervals.map((i) =>
-                    <Dropdown.Item
-                        key={i}
-                        eventKey={i}
-                        // {() => if(i == def_inter) return "active"}
-                        onClick={() => this.update_interval(i)}
-                    >{i} ms
-                    </Dropdown.Item>
-                )}
-                {/* <Dropdown.Item eventKey="3" active>1000 ms</Dropdown.Item> */}
+                {items}
             </DropdownButton>
         );
     }
