@@ -49,6 +49,11 @@ defmodule PiDashWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("status:stop_all_workers", _params, socket) do
+    Obd.PidSup.stop_all_workers()
+    {:noreply, socket}
+  end
+
   def handle_in("status:elm_status", _params, socket) do
     elm_status = Elm.Connector.get_state()
     push(socket, "status:elm_status", %{elm_status: elm_status})

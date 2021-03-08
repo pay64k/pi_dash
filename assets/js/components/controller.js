@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'react-bootstrap';
 import Clock from './clock'
 import Interval from './interval'
 import Dash from "./dash";
@@ -80,6 +80,13 @@ class Controller extends React.Component {
     saveToLS("active_pids", this.state.active_pids)
   }
 
+  clear_all_pids(){
+    this.pushOnChannel("status:stop_all_workers")
+    saveToLS("active_pids", [])
+    this.setState({ active_pids: [] })
+    location.reload();
+  }
+
   maybe_start_pid_worker_cb = (pid) => {
     this.maybe_start_pid_worker(pid)
   }
@@ -104,6 +111,9 @@ class Controller extends React.Component {
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
                     maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
+                  <Button 
+                    onClick={() => this.clear_all_pids()} 
+                    variant="secondary">Clear</Button>{' '}
                 </ButtonGroup>
               </div>
               <div className="col-md-4">
@@ -111,7 +121,6 @@ class Controller extends React.Component {
               </div>
             </div>
           </div>
-          {/* <Button onClick={() => this.askForStatus(this.channel)} variant="outline-secondary" size="sm">PIDs</Button>{' '} */}
         </footer>
       </div >
     );

@@ -10,6 +10,7 @@ class LinearGauge extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.name, "did mount")
         this.props.channel.on("update:" + this.props.name, (message) => {
             // console.log("update in gauge " + this.props.name, message)
             var canvas = document.getElementById(this.props.name);
@@ -19,6 +20,11 @@ class LinearGauge extends React.Component {
             ctx.fillRect(0, 0, this.calculateWidth(message.value, canvas), canvas.height);
             this.setState({ value: message.value })
         });
+    }
+
+    componentWillUnmount(){
+        console.log(this.props.name, "will unmount")
+        this.props.channel.off("update:" + this.props.name)
     }
 
     calculateWidth(value, canvas) {

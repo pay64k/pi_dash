@@ -1,6 +1,8 @@
 defmodule Obd.PidSup do
   use Supervisor
 
+  require Logger
+
   def start_link() do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -21,9 +23,16 @@ defmodule Obd.PidSup do
   end
 
   def stop_pid_worker(obd_pid_name) do
-    Supervisor.delete_child(__MODULE__, obd_pid_name)
+    Logger.info("Stop pid_worker: #{obd_pid_name}")
+    :ok = Supervisor.terminate_child(__MODULE__, obd_pid_name)
+    :ok = Supervisor.delete_child(__MODULE__, obd_pid_name)
   end
-  # TODO kill pid_worker
+
+  def stop_all_workers() do
+    __MODULE__
+    |> Supervisor.which_children()
+    |> Enum.each(fn {id, _, _, _} -> stop_pid_worker(id) end)
+  end
 
   defp child_spec(obd_pid_name, interval) do
     %{
