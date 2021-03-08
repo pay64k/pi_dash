@@ -67,7 +67,6 @@ class Controller extends React.Component {
     })
 
     if (!exists) {
-      console.log("doesn't exist: ", pid)
       pid["interval"] = this.state.active_interval
       this.state.active_pids.push(pid)
     }
@@ -96,18 +95,18 @@ class Controller extends React.Component {
         <footer className="controller bg-light text-center text-lg-start">
           <div className="container">
             <div className="row row-30">
-              <div className="col-md-3">
+              <div className="col-md-4">
                 <h5>{this.state.elm_status}</h5>
               </div>
-              <div className="col-md-3">
-                <Interval update_active_interval_cb={this.update_active_interval_cb} />
+              <div className="col-md-4">
+                <ButtonGroup aria-label="Third group">
+                  <Interval update_active_interval_cb={this.update_active_interval_cb} />
+                  <PidsDropdown
+                    supported_pids={this.state.supported_pids}
+                    maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
+                </ButtonGroup>
               </div>
-              <div className="col-md-3">
-                <PidsDropdown
-                  supported_pids={this.state.supported_pids}
-                  maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
-              </div>
-              <div className="col-md-3">
+              <div className="col-md-4">
                 <Clock />
               </div>
             </div>

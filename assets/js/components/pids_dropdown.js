@@ -9,7 +9,6 @@ class PidsDropdown extends React.Component {
 
     render() {
         return (
-            <div className="mb-2">
                 <DropdownButton
                     as={ButtonGroup}
                     key="pids_dropdown"
@@ -30,7 +29,6 @@ class PidsDropdown extends React.Component {
                         >{pid.obd_pid_name}</Dropdown.Item>
                     ))}
                 </DropdownButton>
-            </div>
         );
     }
 }
