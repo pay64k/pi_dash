@@ -29,8 +29,23 @@ defmodule PiDashWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in("status:start_pid_worker", %{"pid_name" => pid_name, "interval" => interval}, socket) do
-    Obd.PidSup.start_pid_worker(pid_name, interval)
+  def handle_in(
+        "status:start_pid_worker",
+        %{"pid_name" => pid_name, "interval" => interval},
+        socket
+      ) do
+    pid_name
+    |> String.to_atom()
+    |> Obd.PidSup.start_pid_worker(interval)
+
+    {:noreply, socket}
+  end
+
+  def handle_in("status:stop_pid_worker", %{"pid_name" => pid_name}, socket) do
+    pid_name
+    |> String.to_atom()
+    |> Obd.PidSup.stop_pid_worker()
+
     {:noreply, socket}
   end
 

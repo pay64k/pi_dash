@@ -3,6 +3,7 @@ import { Button, DropdownButton, Dropdown, ButtonGroup } from 'react-bootstrap';
 import Clock from './clock'
 import Interval from './interval'
 import Dash from "./dash";
+import PidsDropdown from "./pids_dropdown"
 
 const active_pids = getFromLS("active_pids") || [];
 
@@ -35,7 +36,6 @@ class Controller extends React.Component {
       this.setState({
         elm_status: message.elm_status
       });
-      console.log(this.state)
     });
 
     this.channel.on("status:supported_pids", (message) => {
@@ -67,20 +67,25 @@ class Controller extends React.Component {
     })
 
     if (!exists) {
+      console.log("doesn't exist: ", pid)
       pid["interval"] = this.state.active_interval
       this.state.active_pids.push(pid)
     }
 
     if (!started) {
-      this.pushOnChannel("status:start_pid_worker", 
-        { "pid_name": pid.obd_pid_name, "interval": pid.interval })
       pid["started"] = true
+      this.pushOnChannel("status:start_pid_worker",
+        { "pid_name": pid.obd_pid_name, "interval": pid.interval })
     }
 
     saveToLS("active_pids", this.state.active_pids)
   }
 
-  update_active_interval = (new_interval) => {
+  maybe_start_pid_worker_cb = (pid) => {
+    this.maybe_start_pid_worker(pid)
+  }
+
+  update_active_interval_cb = (new_interval) => {
     this.setState({ active_interval: new_interval });
   }
 
@@ -88,38 +93,19 @@ class Controller extends React.Component {
     return (
       <div>
         <Dash channel={this.channel} active_pids={this.state.active_pids} />
-        <footer className="bg-light text-center text-lg-start">
+        <footer className="controller bg-light text-center text-lg-start">
           <div className="container">
             <div className="row row-30">
               <div className="col-md-3">
-                <h4>{this.state.elm_status}</h4>
+                <h5>{this.state.elm_status}</h5>
               </div>
               <div className="col-md-3">
-                <Interval active_interval_cb={this.update_active_interval} />
+                <Interval update_active_interval_cb={this.update_active_interval_cb} />
               </div>
               <div className="col-md-3">
-                <div className="mb-2">
-                  <DropdownButton
-                    as={ButtonGroup}
-                    key="pids_dropdown"
-                    id="pids_dropdown"
-                    drop="up"
-                    variant="secondary"
-                    title="PIDS"
-                  >
-                    {this.state.supported_pids.map((pid) => (
-                      <Dropdown.Item
-                        key={pid.obd_pid_name}
-                        eventKey={pid.obd_pid_name}
-                        onClick={() => {
-                          this.maybe_start_pid_worker(pid)
-                        }
-                        }
-
-                      >{pid.obd_pid_name}</Dropdown.Item>
-                    ))}
-                  </DropdownButton>
-                </div>
+                <PidsDropdown
+                  supported_pids={this.state.supported_pids}
+                  maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
               </div>
               <div className="col-md-3">
                 <Clock />

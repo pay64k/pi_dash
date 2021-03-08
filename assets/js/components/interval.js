@@ -12,7 +12,7 @@ class Interval extends React.Component {
     }
 
     update_interval(new_interval) {
-        this.props.active_interval_cb(new_interval)
+        this.props.update_active_interval_cb(new_interval)
         this.setState({
             active: new_interval
         })

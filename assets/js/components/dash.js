@@ -29,7 +29,6 @@ class Dash extends React.Component {
 
   }
 // TODO pick gauge type: linear, circle etc
-// TODO pick up refresh interval
   render() {
     return (
       <ResponsiveReactGridLayout

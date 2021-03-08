@@ -13,6 +13,23 @@ body {
 #root {
   width: 100%;
 }
+
+.controller{
+  padding: 5px 0 0 0;
+}
+
+h4 {
+  padding: 10px !important;
+}
+
+h5 {
+  padding: 10px !important;
+}
+
+.react-resizable-handle{
+  width: 40px !important;
+  height: 30px !important;
+}
 .react-grid-layout {
   background: #eee;
   margin-top: 10px;

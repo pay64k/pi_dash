@@ -20,14 +20,15 @@ defmodule Obd.PidSup do
     Supervisor.start_child(__MODULE__, child_spec(obd_pid_name, interval))
   end
 
+  def stop_pid_worker(obd_pid_name) do
+    Supervisor.delete_child(__MODULE__, obd_pid_name)
+  end
   # TODO kill pid_worker
 
   defp child_spec(obd_pid_name, interval) do
-    pid = String.to_atom(obd_pid_name)
-
     %{
-      id: pid,
-      start: {Obd.PidWorker, :start_link, [pid, interval]}
+      id: obd_pid_name,
+      start: {Obd.PidWorker, :start_link, [obd_pid_name, interval]}
     }
   end
 end
