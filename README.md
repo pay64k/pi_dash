@@ -11,9 +11,12 @@ In the beginning I only wanted to make a simple tachometer, but then decided to 
 ## **Note:** The project is still in development and was tested only on several cars. Since I am not a design expert the GUI would use some enhancements - but for now it's the simplest working solution.
 
 #
-
+TODO:
 ## High level overview
 ![alt text](.github/readme/block.png)
+
+
+Install pi_dash on Raspberry Pi (only tested with model 4),
 
 pi_dash is based an Phoenix server that runs on Ra
 

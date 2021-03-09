@@ -1,6 +1,6 @@
-<mxfile host="65bd71144e" modified="2021-03-09T19:23:16.178Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.52.0 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36" version="14.2.4" etag="9UJpwuuxiDVzw4q2gdS9" type="embed">
+<mxfile host="65bd71144e" modified="2021-03-09T19:27:40.109Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.52.0 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36" version="14.2.4" etag="mneQniQTnpyxXlJ4A_IL" type="embed">
     <diagram id="HOK6ZEbGc1ouEtayRxtw" name="Page-1">
-        <mxGraphModel dx="1018" dy="1450" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="868" dy="682" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -25,7 +25,7 @@
                 <mxCell id="4" value="Car's OBD2 port" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
                     <mxGeometry x="40" y="230" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="Display" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
+                <mxCell id="5" value="Display (touch)" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
                     <mxGeometry x="550" y="230" width="120" height="60" as="geometry"/>
                 </mxCell>
             </root>
