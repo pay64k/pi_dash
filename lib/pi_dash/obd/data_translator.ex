@@ -29,6 +29,9 @@ defmodule Obd.DataTranslator do
 
   def handle_data(:intake_temp, <<a::8, _crc>>), do: a - 40
 
+  def handle_data(:throttle_pos, <<a::8, _crc>>), do: 100 / 255 * a
+  def handle_data(:throttle_pos, <<>>), do: 0
+
   def handle_data(_obd_pid, _data), do: {:error, :unhandled}
 
   def parse_supported_pids(hex_string) do

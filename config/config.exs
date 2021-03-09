@@ -7,7 +7,9 @@ config :pi_dash,
     %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},
     %{hex: "0C", obd_pid_name: :speed, min_value: 0, max_value: 255},
     %{hex: "0D", obd_pid_name: :rpm, min_value: 0, max_value: 6500, },
-    %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215}
+    %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215},
+    %{hex: "11", obd_pid_name: :throttle_pos, min_value: 0, max_value: 100}
+
 
     # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
     # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
@@ -24,8 +26,8 @@ config :pi_dash, PiDashWeb.Endpoint,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  level: :info,
-  # level: :debug,
+  # level: :info,
+  level: :debug,
   metadata: [:request_id]
 
 # Use Jason for JSON parsing in Phoenix
@@ -37,8 +39,8 @@ config :logger,
 
 config :logger, :logger_file_backend,
   path: "./pi_dash.log",
-  level: :info,
-  # level: :debug,
+  # level: :info,
+  level: :debug,
   rotate: %{max_bytes: 1_048_576, keep: 5},
   format: "\n$date $time [$level] $metadata $message",
   metadata: [:pid, :module, :function, :line]

@@ -158,7 +158,7 @@ defmodule Elm.Connector do
 
       data.last_sent_command in @obd_pids_supported ->
         next = {!String.contains?(msg, "NO DATA"), Enum.count(data.elm_queue) > 0}
-        Logger.debug(":get_suuported_pids {next}: #{inspect(next)}")
+        Logger.debug(":get_supported_pids {next}: #{inspect(next)}")
 
         case next do
           {false, true} ->
@@ -220,8 +220,10 @@ defmodule Elm.Connector do
 
       _ ->
         to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
-        send(Process.whereis(obd_pid_name), {:process, to_send})
-        :keep_state_and_data
+        if System.get_env("TEST_MODE"), do: :keep_state_and_data,
+        else:
+          send(Process.whereis(obd_pid_name), {:process, to_send})
+          :keep_state_and_data
     end
   end
 
