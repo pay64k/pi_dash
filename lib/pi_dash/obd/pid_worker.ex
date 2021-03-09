@@ -43,9 +43,8 @@ defmodule Obd.PidWorker do
     case Obd.DataTranslator.handle_data(msg) do
       {:error, reason} ->
         Logger.warn(
-          "could not translate: #{inspect(msg.data, binaries: :as_binaries)}, reason: #{
-            inspect(reason)
-          }"
+          "#{inspect(state.obd_pid_name)} could not translate: #{inspect(msg.data)}, binary:
+          #{inspect(msg.data, binaries: :as_binaries)}, reason: #{inspect(reason)}"
         )
 
         to_web = format_msg_to_web(last_value, state)
