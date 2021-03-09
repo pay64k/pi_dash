@@ -41,8 +41,6 @@ defmodule Elm.Connector do
     GenStateMachine.call(__MODULE__, :get_state)
   end
 
-  # PiDashWeb.RoomChannel.send_to_channel(:status, %{status: :connected})
-
   def start_link() do
     GenStateMachine.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -208,6 +206,8 @@ defmodule Elm.Connector do
     GenStateMachine.cast(__MODULE__, :open_connection)
     {:next_state, :connect, %Data{}}
   end
+
+  # TODO handle: Got from ELM: ">NO DATA", state: :connected_configured
 
   defp handle_msg(msg, :connected_configured, _data) do
     case check_data(msg) do
