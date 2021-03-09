@@ -13,7 +13,7 @@ In the beginning I only wanted to make a simple tachometer, but then decided to 
 #
 
 ## High level overview
-![alt text](.github/readme/block.svg)
+![alt text](.github/readme/block.png)
 
 pi_dash is based an Phoenix server that runs on Ra
 
