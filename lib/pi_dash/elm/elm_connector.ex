@@ -19,9 +19,10 @@ defmodule Elm.Connector do
   @elm_device_name "Prolific"
 
   @obd_pids_supported [
-    "01" <> PT.name_to_pid(:pids_a),
-    "01" <> PT.name_to_pid(:pids_b),
-    "01" <> PT.name_to_pid(:pids_c)
+    "01" <> PT.name_to_pid(:pids_a)
+    #TODO: renable after coorect pids calculations are done (pid + offset)
+    # "01" <> PT.name_to_pid(:pids_b),
+    # "01" <> PT.name_to_pid(:pids_c)
   ]
 
   def write_at_command(msg) do
