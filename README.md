@@ -20,17 +20,28 @@ https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
 https://www.pi-shop.ch/5-inch-capacitive-touch-screen-800x480-hdmi-monitor-tft-lcd-display-fuer-raspberry-pi
-framebuffer_width=800 
-framebuffer_height=480 
-hdmi_force_hotplug=1 
-hdmi_group=2 
-hdmi_mode=87 
-hdmi_cvt  800  480  60  6  0  0  0 
+framebuffer_width=800
+framebuffer_height=480
+hdmi_force_hotplug=1
+hdmi_group=2
+hdmi_mode=87
+hdmi_cvt  800  480  60  6  0  0  0
 
 https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup
 https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup
 install lightdm
 change raspi-config to autologin to dektop
+
+for vnc:
+https://askubuntu.com/a/1068322
+$ sudo apt-get install gnome-panel gnome-settings-daemon metacity nautilus gnome-terminal
+Then I added the lines below to ~/.vnc/xstartup:
+
+gnome-panel &
+gnome-settings-daemon &
+metacity &
+nautilus &
+chmod +x ~/.vnc/xstartup
 
 https://asdf-vm.com/#/core-manage-asdf
 https://github.com/asdf-vm/asdf-erlang
