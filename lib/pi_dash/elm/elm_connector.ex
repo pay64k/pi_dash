@@ -45,9 +45,8 @@ defmodule Elm.Connector do
   end
 
   def init(_) do
-    {:ok, uart_port_pid} = Circuits.UART.start_link()
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid}}
+    {:ok, :connect, %Data{elm_queue: elm_opts()}}
   end
 
   def handle_event(
@@ -95,16 +94,19 @@ defmodule Elm.Connector do
   end
 
   def handle_event(:cast, :open_connection, :connect, data) do
-    case open_serial(data.uart_port_pid) do
+
+    {:ok, uart_port_pid} = Circuits.UART.start_link()
+
+    case open_serial(uart_port_pid) do
       {:ok, port} ->
         case System.get_env("TEST_MODE", nil) do
           "true" ->
             start_pid_sup()
-            {:next_state, :connected_configured, %{data | port: port}}
+            {:next_state, :connected_configured, %{data | port: port, uart_port_pid: uart_port_pid}}
 
           nil ->
             write_at_command("Z")
-            {:next_state, :configuring, %{data | port: port, last_sent_command: "Z"}}
+            {:next_state, :configuring, %{data | port: port, uart_port_pid: uart_port_pid, last_sent_command: "Z"}}
         end
 
       :error ->
@@ -209,37 +211,27 @@ defmodule Elm.Connector do
   # TODO handle: Got from ELM: ">NO DATA", state: :connected_configured
 
   defp handle_msg(msg, :connected_configured, _data) do
-    case check_data(msg) do
-      :discarding ->
-        Logger.warn(
-          "Discarding incomplete data: #{msg}, due to odd size of bytes (#{byte_size(msg)}"
-        )
+    to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
+    res = Process.whereis(obd_pid_name)
 
+    case res do
+      nil ->
         :keep_state_and_data
 
-      _ ->
-        to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
-        res = Process.whereis(obd_pid_name)
-
-        case res do
-          nil ->
-            :keep_state_and_data
-
-          pid ->
-            send(pid, {:process, to_send})
-            :keep_state_and_data
-        end
+      pid ->
+        send(pid, {:process, to_send})
+        :keep_state_and_data
     end
   end
 
   defp prepare_received(msg) do
     if System.get_env("TEST_MODE") do
-      new_msg =
+      msg =
         msg
         |> String.replace(">", "")
         |> String.replace(" ", "")
 
-      "1" <> new_msg <> "11"
+      "1" <> msg <> "11"
     else
       msg = String.replace(msg, ">", "")
 
@@ -247,13 +239,6 @@ defmodule Elm.Connector do
         0 -> msg
         _ -> "0" <> msg
       end
-    end
-  end
-
-  defp check_data(hex_string) do
-    case rem(byte_size(hex_string), 2) do
-      0 -> hex_string
-      _ -> :discarding
     end
   end
 
