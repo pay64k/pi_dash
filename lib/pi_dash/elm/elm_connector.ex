@@ -20,7 +20,7 @@ defmodule Elm.Connector do
 
   @obd_pids_supported [
     "01" <> PT.name_to_pid(:pids_a)
-    #TODO: renable after coorect pids calculations are done (pid + offset)
+    # TODO: renable after coorect pids calculations are done (pid + offset)
     # "01" <> PT.name_to_pid(:pids_b),
     # "01" <> PT.name_to_pid(:pids_c)
   ]
@@ -84,9 +84,10 @@ defmodule Elm.Connector do
     res =
       if System.get_env("TEST_MODE") do
         for %{hex: h} <- Application.fetch_env!(:pi_dash, :app_supported_pids), do: h
-        else
-           data.supported_pids |> List.flatten() |> Enum.uniq()
-        end
+      else
+        data.supported_pids |> List.flatten() |> Enum.uniq()
+      end
+
     {:next_state, state, data, [{:reply, from, res}]}
   end
 
@@ -220,26 +221,26 @@ defmodule Elm.Connector do
 
       _ ->
         to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
-        if System.get_env("TEST_MODE"), do: :keep_state_and_data,
-        else:
-          send(Process.whereis(obd_pid_name), {:process, to_send})
-          :keep_state_and_data
+        send(Process.whereis(obd_pid_name), {:process, to_send})
+        :keep_state_and_data
     end
   end
 
   defp prepare_received(msg) do
-    case System.get_env("TEST_MODE", nil) do
-      "true" ->
-        new_msg =
-          msg
-          |> String.replace(">", "")
-          |> String.replace(" ", "")
-
-        "1" <> new_msg <> "11"
-
-      nil ->
+    if System.get_env("TEST_MODE") do
+      new_msg =
         msg
         |> String.replace(">", "")
+        |> String.replace(" ", "")
+
+      "1" <> new_msg <> "11"
+    else
+      msg = String.replace(msg, ">", "")
+
+      case rem(byte_size(msg), 2) do
+        0 -> msg
+        _ -> "0" <> msg
+      end
     end
   end
 
