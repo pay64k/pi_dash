@@ -220,7 +220,6 @@ defmodule Elm.Connector do
         :keep_state_and_data
 
       _ ->
-        # TODO not send if there is no proc e.g. when pid workers are killed by gui
         to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
         res = Process.whereis(obd_pid_name)
 
