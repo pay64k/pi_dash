@@ -59,9 +59,9 @@ defmodule ElmTest do
     assert_wrote("0100")
     send_to_connector("486B104100BE1FA813C9", context)
     assert_wrote("0120")
-    send_to_connector("486B104100BE1FAFF3C9", context)
+    send_to_connector("486B104120BE1FAFF3C9", context)
     assert_wrote("0140")
-    send_to_connector("486B104100BE1FAA13C9", context)
+    send_to_connector("486B104140BE1FAA13C9", context)
     assert get_state() == :connected_configured
     true
   end

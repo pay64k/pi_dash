@@ -19,10 +19,9 @@ defmodule Elm.Connector do
   @elm_device_name "Prolific"
 
   @obd_pids_supported [
-    "01" <> PT.name_to_pid(:pids_a)
-    # TODO: renable after coorect pids calculations are done (pid + offset)
-    # "01" <> PT.name_to_pid(:pids_b),
-    # "01" <> PT.name_to_pid(:pids_c)
+    "01" <> PT.name_to_pid(:pids_a),
+    "01" <> PT.name_to_pid(:pids_b),
+    "01" <> PT.name_to_pid(:pids_c)
   ]
 
   def write_at_command(msg) do
@@ -175,7 +174,7 @@ defmodule Elm.Connector do
 
           {true, true} ->
             supported = Obd.DataTranslator.parse_supported_pids(msg)
-            Logger.info("Supported PIDs: #{inspect(supported)}")
+            pretty_log_supported_pids(supported)
             {to_send, rest} = List.pop_at(data.elm_queue, 0)
             write_command(to_send)
 
@@ -189,13 +188,12 @@ defmodule Elm.Connector do
 
           {true, false} ->
             supported = Obd.DataTranslator.parse_supported_pids(msg)
-            Logger.info("Supported PIDs: #{inspect(supported)}")
+            pretty_log_supported_pids(supported)
             start_pid_sup()
 
             {
               :next_state,
               :connected_configured,
-              # TODO store supported pids with mode e.g 01 01
               %Data{data | supported_pids: data.supported_pids ++ [supported]}
             }
         end
@@ -368,4 +366,13 @@ defmodule Elm.Connector do
     {:ok, pid} = Supervisor.start_link(child, opts)
     pid
   end
+
+  defp pretty_log_supported_pids(pids) do
+    pretty =
+      for p <- pids, do: Obd.PidTranslator.pid_to_name(p)
+
+    Logger.info("Supported PIDs hex: #{inspect(pids)}")
+    Logger.info("Supported PIDs names: #{inspect(pretty, limit: :infinity, pretty: true)}")
+  end
+
 end

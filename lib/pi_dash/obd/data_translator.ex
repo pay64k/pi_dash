@@ -45,29 +45,30 @@ defmodule Obd.DataTranslator do
   def handle_data(_obd_pid, _data), do: {:error, :unhandled}
 
   def parse_supported_pids(hex_string) do
-    stream =
+    {stream, offset} =
       hex_string
       |> Base.decode16!()
       |> extract_sup_pids_data()
-      |> ExBin.bits()
+
+    bits = ExBin.bits(stream)
 
     {_, supported_pids} =
-      Enum.reduce(stream, {1, []}, fn bit, {count, acc} ->
+      Enum.reduce(bits, {1, []}, fn bit, {count, acc} ->
         case bit do
           0 -> {count + 1, acc}
-          1 -> {count + 1, acc ++ [convert_and_pad(count)]}
+          1 -> {count + 1, acc ++ [convert_and_pad(count, offset)]}
         end
       end)
 
     supported_pids
   end
 
-  def extract_sup_pids_data(<<_header::24, _mode::8, _pid::8, data::32, _crc::binary>>) do
-    <<data::32>>
+  def extract_sup_pids_data(<<_header::24, _mode::8, pid::8, data::32, _crc::binary>>) do
+    {<<data::32>>, pid}
   end
 
-  defp convert_and_pad(int) do
-    str = Integer.to_string(int, 16)
+  defp convert_and_pad(int, offset) do
+    str = Integer.to_string(int + offset, 16)
 
     case String.length(str) do
       1 -> String.pad_leading(str, 2, "0")
