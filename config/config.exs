@@ -8,11 +8,8 @@ config :pi_dash,
     %{hex: "0C", obd_pid_name: :speed, min_value: 0, max_value: 255},
     %{hex: "0D", obd_pid_name: :rpm, min_value: 0, max_value: 6500, },
     %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215},
-    %{hex: "11", obd_pid_name: :throttle_pos, min_value: 0, max_value: 100}
-
-
-    # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
-    # %{hex: "AA", obd_pid_name: :AA, , min_value: 0, max_value: 255},
+    %{hex: "11", obd_pid_name: :throttle_pos, min_value: 0, max_value: 100},
+    %{hex: "0E", obd_pid_name: :timing_advance, min_value: -64, max_value: 63.5}
   ]
 
 # Configures the endpoint
