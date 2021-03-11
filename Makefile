@@ -12,6 +12,7 @@ release:
 
 install:
 	rm -rf ~/pi_dash || true
+	mkdir -p /var/log/pi_dash
 	mkdir -p ~/pi_dash 
 	cp _build/prod/pi_dash-0.1.0.tar.gz ~/pi_dash
 	cd ~/pi_dash && \
