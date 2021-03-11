@@ -9,6 +9,6 @@ config :logger,
   backends: [{Loggix, :logger_file_backend}]
 
 config :logger, :logger_file_backend,
-  path: "/var/log/pi_dash/pi_dash.log",
+  path: "/var/log/pi_dash/pi_dash.log"
 
 import_config "prod.secret.exs"
