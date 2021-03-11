@@ -100,13 +100,13 @@ class Controller extends React.Component {
       <div>
         <Dash channel={this.channel} active_pids={this.state.active_pids} />
         <footer className="controller bg-light text-center text-lg-start">
-          <div className="container">
+          <div className="container p-0">
             <div className="row row-30">
-              <div className="col-md-4">
-                <h5>{this.state.elm_status}</h5>
+              <div className="col-sm">
+                <h6>{this.state.elm_status}</h6>
               </div>
-              <div className="col-md-4">
-                <ButtonGroup aria-label="Third group">
+              <div className="col-sm">
+                <ButtonGroup aria-label="Buttons">
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
@@ -116,7 +116,7 @@ class Controller extends React.Component {
                     variant="secondary">Clear</Button>{' '}
                 </ButtonGroup>
               </div>
-              <div className="col-md-4">
+              <div className="col-sm">
                 <Clock />
               </div>
             </div>
