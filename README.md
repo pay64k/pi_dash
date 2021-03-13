@@ -33,21 +33,21 @@ for detached mode.
 
 [Chromium in kiosk mode and autostart](https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup)
 ### Autostart application
-After following second instructions in [Chromium in kiosk mode and autostart](https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup) edit `sudo nano /etc/xdg/openbox/autostart` and add one line to start `pi_dash` on boot:
+After following instructions in [Chromium in kiosk mode and autostart](https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup) edit `sudo nano /etc/xdg/openbox/autostart` and add one line to start `pi_dash` on boot:
 ```
 ./home/$USER/pi_dash/bin/pi_dash daemon
 ```
 ### Hibernate mode (car engine off)
 TBD
 ## Development mode
-Install [ELM327-emulator](https://github.com/Ircama/ELM327-emulator) run with `python3 -m elm` and run command `scenario car`. Note the serial port and change it in `config.exs`. Run `make test_mode`, in browser open `localhost:4000`.
+Install [ELM327-emulator](https://github.com/Ircama/ELM327-emulator) and run with `python3 -m elm`, then run command `scenario car`. Note the serial port and change it in `config.exs`. Run `make test_mode`, in browser open `localhost:4000`.
 
 ## Building from main
 Since the target platform is Raspberry Pi the application has to be built with that architecture in mind. I've tried to use `docker buildx`, but so far didn't succeed.
 
 You can fork this repo, install GitHub's `action-runner` and use `.github/workflows/build_on_rpi4.yml` to build it on your own RPi4. 
 
-But before do the following:
-1. label your runner as `rpi4z
-2. on RPi you need to install Erlang and Elixir. I recommend using [asdf](https://asdf-vm.com/#/core-manage-asdf). You will need [Erlang](https://github.com/asdf-vm/asdf-erlang) and [Elixir](https://github.com/asdf-vm/asdf-elixir.git) as well as [nodejs](https://github.com/asdf-vm/asdf-nodejs).
+Before running the workflow, do the following:
+1. label your runner as `rpi4`
+2. on RPi you need to install 3 packages. I recommend using [asdf](https://asdf-vm.com/#/core-manage-asdf). You will need [Erlang](https://github.com/asdf-vm/asdf-erlang) and [Elixir](https://github.com/asdf-vm/asdf-elixir.git) as well as [nodejs](https://github.com/asdf-vm/asdf-nodejs).
 
