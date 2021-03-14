@@ -51,3 +51,8 @@ Before running the workflow, do the following:
 1. label your runner as `rpi4`
 2. on RPi you need to install 3 packages. I recommend using [asdf](https://asdf-vm.com/#/core-manage-asdf). You will need [Erlang](https://github.com/asdf-vm/asdf-erlang) and [Elixir](https://github.com/asdf-vm/asdf-elixir.git) as well as [nodejs](https://github.com/asdf-vm/asdf-nodejs).
 
+TODO:
+* [ ] Hibernate RPi when the car engine is off (or by external button flip)
+* [ ] Add support for ELM devices from different manufacturers
+* [ ] Enhance GUI: make it more flashy? Add theme support?
+* [ ] Create `img` file with all above configuration ready to burn on SD card for RPi
