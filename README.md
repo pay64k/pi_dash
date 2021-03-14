@@ -35,7 +35,7 @@ for detached mode.
 ### Autostart application
 After following instructions in [Chromium in kiosk mode and autostart](https://desertbot.io/blog/raspberry-pi-4-touchscreen-kiosk-setup) edit `sudo nano /etc/xdg/openbox/autostart` and add one line to start `pi_dash` on boot:
 ```
-./home/$USER/pi_dash/bin/pi_dash daemon
+/home/$USER/pi_dash/bin/pi_dash daemon
 ```
 ### Hibernate mode (car engine off)
 TBD
