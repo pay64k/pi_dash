@@ -56,4 +56,4 @@ TODO:
 * [ ] Longer tests with car to test stability of the application, deadlocks etc
 * [ ] Add support for ELM devices from different manufacturers
 * [ ] Enhance GUI: support for different gauge types. Make it more flashy? Add theme support?
-* [ ] Create `img` file with all above configuration ready to burn on SD card for RPi, [guide](https://medium.com/platformer-blog/creating-a-custom-raspbian-os-image-for-production-3fcb43ff3630)
+* [ ] Create `img` file with all above configuration ready to burn on SD card for RPi, [guide](https://medium.com/platformer-blog/creating-a-custom-raspbian-os-image-for-production-3fcb43ff3630) or can Nerves do the same?
