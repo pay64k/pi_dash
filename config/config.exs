@@ -2,6 +2,8 @@ use Mix.Config
 
 config :pi_dash,
   serial_port: "/dev/ttys001",
+  supported_manufacturers: ["Prolific"],
+  supported_serial_names: ["OBDII"],
   app_supported_pids: [
     %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100},
     %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},
