@@ -1,11 +1,11 @@
-defmodule ElmTest do
+defmodule ElmConnectorTest do
   use ExUnit.Case
 
   setup do
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
-    ExMeck.expect(Circuits.UART, :enumerate, fn -> [{"port", %{manufacturer: "Prolific"}}] end)
+    ExMeck.expect(Circuits.UART, :enumerate, fn -> %{"port" => %{manufacturer: "Prolific"}} end)
 
     pid = start_connector()
 
@@ -17,7 +17,7 @@ defmodule ElmTest do
   end
 
   test "sunny day - full configuration ok", context do
-    assert true == full_configuration(context)
+    assert full_configuration(context)
   end
 
   # TODO
