@@ -34,7 +34,7 @@ for detached mode.
 ### Run on specific serial port
 If pi_dash doesn't find a supported ELM device to connect to it will try on specific serial port. If your ELM device is not supported (e.g. does not auto-detect) you can edit
 ```
-/home/$USER//pi_dash/releases/0.1.1/env.sh
+/home/$USER/pi_dash/releases/0.1.1/env.sh
 ```
 
 and change `SERIAL_PORT` environment variable to you port, for example:
