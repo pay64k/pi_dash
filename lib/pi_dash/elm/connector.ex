@@ -6,7 +6,8 @@ defmodule Elm.Data do
     :elm_version,
     :last_sent_command,
     :protocol_number,
-    supported_pids: []
+    supported_pids: [],
+    tref: nil
   ]
 end
 
@@ -43,8 +44,9 @@ defmodule Elm.Connector do
   end
 
   def init(_) do
+    {:ok, uart_port_pid} = Circuits.UART.start_link()
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:ok, :connect, %Data{elm_queue: elm_opts()}}
+    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid}}
   end
 
   def handle_event(
@@ -76,6 +78,14 @@ defmodule Elm.Connector do
     :keep_state_and_data
   end
 
+  def handle_event(:info, :connect_timeout, _state, data) do
+    Logger.warn("Didn't get a response from ELM. Restarting...")
+    Process.cancel_timer(data.tref)
+    tref = Process.send_after(self(), :connect_timeout, 3000)
+    GenStateMachine.cast(__MODULE__, :open_connection)
+    {:next_state, :connect, %Data{data | elm_queue: elm_opts(), last_sent_command: nil, tref: tref}}
+  end
+
   def handle_event({:call, from}, :get_supported_pids, state, data) do
     res =
       if System.get_env("TEST_MODE") do
@@ -91,10 +101,13 @@ defmodule Elm.Connector do
     {:next_state, state, data, [{:reply, from, state}]}
   end
 
-  def handle_event(:cast, :open_connection, :connect, data) do
+  def handle_event(:cast, :open_connection, :connect, data = %{uart_port_pid: uart_port_pid}) do
 
-    {:ok, uart_port_pid} = Circuits.UART.start_link()
-    # Circuits.UART.find_pids |> IO.inspect
+    # {:ok, uart_port_pid} = Circuits.UART.start_link()
+
+    Logger.warn "attmpting to find pids"
+    # p = Circuits.UART.find_pids
+    # Logger.warn("pids: #{inspect p}")
     # Enum.each(Circuits.UART.find_pids, fn r ->
     #   case r do
     #     nil -> :ok
@@ -107,11 +120,12 @@ defmodule Elm.Connector do
         case System.get_env("TEST_MODE", nil) do
           "true" ->
             start_pid_sup()
-            {:next_state, :connected_configured, %{data | port: port, uart_port_pid: uart_port_pid}}
+            {:next_state, :connected_configured, %Data{data | port: port}}
 
           nil ->
             write_at_command("Z")
-            {:next_state, :configuring, %{data | port: port, uart_port_pid: uart_port_pid, last_sent_command: "Z"}}
+            tref = Process.send_after(self(), :connect_timeout, 3000)
+            {:next_state, :configuring, %Data{data | port: port, last_sent_command: "Z", tref: tref}}
         end
 
       :error ->
@@ -124,6 +138,8 @@ defmodule Elm.Connector do
   defp handle_msg(msg, :configuring, data) do
     cond do
       String.contains?(msg, "Z") and data.last_sent_command == "Z" ->
+        Process.cancel_timer(data.tref)
+        {:keep_state, %Data{data | tref: nil}}
         :keep_state_and_data
 
       String.contains?(msg, "ELM") and data.last_sent_command == "Z" ->
@@ -297,7 +313,7 @@ defmodule Elm.Connector do
 
     case res do
       :ok ->
-        Logger.info("Connected to ELM on serial port #{inspect(serial_port)}!")
+        Logger.info("Serial port #{inspect(serial_port)} opened...")
         {:ok, serial_port}
 
       {:error, reason} ->
