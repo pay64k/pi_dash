@@ -1,4 +1,5 @@
 [![build_on_rpi4](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml)
+[![CI](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml)
 
 # pi_dash - automotive (rally) dash written in Elixir and React that runs on Raspberry Pi
 
@@ -56,6 +57,7 @@ Install [ELM327-emulator](https://github.com/Ircama/ELM327-emulator) and run wit
 
 ## Building from main
 Since the target platform is Raspberry Pi the application has to be built with that architecture in mind. I've tried to use `docker buildx`, but so far didn't succeed.
+
 
 You can fork this repo, install GitHub's `action-runner` and use `.github/workflows/build_on_rpi4.yml` to build it on your own RPi4.
 
