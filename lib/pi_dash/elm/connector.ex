@@ -102,19 +102,6 @@ defmodule Elm.Connector do
   end
 
   def handle_event(:cast, :open_connection, :connect, data = %{uart_port_pid: uart_port_pid}) do
-
-    # {:ok, uart_port_pid} = Circuits.UART.start_link()
-
-    Logger.warn "attmpting to find pids"
-    # p = Circuits.UART.find_pids
-    # Logger.warn("pids: #{inspect p}")
-    # Enum.each(Circuits.UART.find_pids, fn r ->
-    #   case r do
-    #     nil -> :ok
-    #     {pid, _} -> Process.exit(pid, :kill)
-    #   end
-    # end)
-
     case open_serial(uart_port_pid) do
       {:ok, port} ->
         case System.get_env("TEST_MODE", nil) do
