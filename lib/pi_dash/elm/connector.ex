@@ -94,6 +94,13 @@ defmodule Elm.Connector do
   def handle_event(:cast, :open_connection, :connect, data) do
 
     {:ok, uart_port_pid} = Circuits.UART.start_link()
+    # Circuits.UART.find_pids |> IO.inspect
+    # Enum.each(Circuits.UART.find_pids, fn r ->
+    #   case r do
+    #     nil -> :ok
+    #     {pid, _} -> Process.exit(pid, :kill)
+    #   end
+    # end)
 
     case open_serial(uart_port_pid) do
       {:ok, port} ->

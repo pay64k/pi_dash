@@ -22,6 +22,7 @@ defmodule Elm.Utils do
 
   defp find_serial_port() do
     devices = Circuits.UART.enumerate()
+    Logger.debug("Enumerated ports: #{inspect(devices)}")
 
     found_by_manufacturer =
       Enum.filter(devices, fn {_, m} ->
@@ -34,6 +35,12 @@ defmodule Elm.Utils do
         search_in_names(port, Application.get_env(:pi_dash, :supported_serial_names))
       end)
 
+    Logger.debug(
+      "found_by_manufacturer: #{inspect(found_by_manufacturer)}, found_by_port_names: #{
+        inspect found_by_port_names
+      }"
+    )
+
     found = found_by_manufacturer ++ found_by_port_names
 
     cond do
@@ -42,9 +49,7 @@ defmodule Elm.Utils do
     end
   end
 
-  defp search_in_names(item, list) do
-    Enum.filter(list, fn e ->
-      String.contains?(item, e)
-    end)
+  defp search_in_names(port, list) do
+    Enum.any?(list, fn p_list -> String.contains?(port, p_list) end)
   end
 end

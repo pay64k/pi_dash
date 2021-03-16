@@ -49,4 +49,17 @@ defmodule ElmUtilsTest do
     ExMeck.expect(Circuits.UART, :enumerate, fn -> %{} end)
     assert Application.get_env(:pi_dash, :serial_port) == Utils.serial_port()
   end
+
+  test "No supported devices, but other non supported present - use one from config" do
+    ExMeck.expect(Circuits.UART, :enumerate, fn ->
+      %{
+        "/dev/cu.Bluetooth-Incoming-Port" => %{},
+        "/dev/cu.LGSH2DD-BTSPP1" => %{},
+        "/dev/cu.LGSH2DD-BTSPP2" => %{},
+        "/dev/cu.LGSH2DD-BTSPP3" => %{}
+      }
+    end)
+
+    assert Application.get_env(:pi_dash, :serial_port) == Utils.serial_port()
+  end
 end
