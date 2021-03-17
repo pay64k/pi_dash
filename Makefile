@@ -12,11 +12,11 @@ release:
 
 install:
 	rm -rf ~/pi_dash || true
-	mkdir -p ~/pi_dash 
+	mkdir -p ~/pi_dash
 	mkdir -p ~/pi_dash/log/
-	cp _build/prod/pi_dash-0.1.0.tar.gz ~/pi_dash
+	cp _build/prod/pi_dash-0.1.1.tar.gz ~/pi_dash
 	cd ~/pi_dash && \
-	tar -xvf pi_dash-0.1.0.tar.gz
+	tar -xvf pi_dash-0.1.1.tar.gz
 
 .PHONY: test_mode
 test_mode:
