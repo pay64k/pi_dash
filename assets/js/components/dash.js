@@ -1,6 +1,7 @@
 import React from "react";
 
 import LinearGauge from './linear_gauge'
+import LinearGauge2 from './linear_gauge2'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -42,7 +43,7 @@ class Dash extends React.Component {
       >
         {this.state.active_pids.map((pid) => (
           <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
-            <LinearGauge 
+            <LinearGauge2 
             name={pid.obd_pid_name} 
             min_value={pid.min_value}
             max_value={pid.max_value} 
