@@ -13,7 +13,6 @@ class PidsDropdown extends React.Component {
                     as={ButtonGroup}
                     key="pids_dropdown"
                     id="pids_dropdown"
-                    drop="up"
                     variant="secondary"
                     title="PIDS"
                 >
