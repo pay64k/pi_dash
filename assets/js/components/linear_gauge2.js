@@ -45,12 +45,6 @@ class LinearGauge2 extends React.Component {
         // (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
-    getColor(value) {
-        // from black to red
-        var lightness = (value * 45 / this.props.max_value).toString(10);
-        return ["hsl(0,100%,", lightness - 10, "%)"].join("");
-    }
-
     render() {
         const divStyle = {
             width: "100%",
@@ -58,17 +52,32 @@ class LinearGauge2 extends React.Component {
         };
         return (
             <div style={divStyle}>
-                <BorderLinearProgress variant="determinate" value={this.calculateWidth(this.state.value)}/>
-                    <Typography
-                        style={{
-                            position: "absolute",
-                            color: "white",
-                            top: 0,
-                            mixBlendMode: "difference"
-                        }}
-                    >
-                        {this.props.name} {this.state.value}
-                    </Typography>
+                <BorderLinearProgress variant="determinate" value={this.calculateWidth(this.state.value)} />
+                <Typography
+                    style={{
+                        position: "absolute",
+                        color: "white",
+                        top: 0,
+                        left: "1%",
+                        fontFamily: "monospace",
+                        mixBlendMode: "difference"
+                    }}
+                >
+                    {this.props.name}
+                </Typography>
+                <Typography
+                    style={{
+                        position: "absolute",
+                        color: "white",
+                        top: 0,
+                        left: "99%",
+                        fontFamily: "monospace",
+                        transform: "translateX(-100%)",
+                        mixBlendMode: "difference"
+                    }}
+                >
+                    {this.state.value}
+                </Typography>
             </div>
         )
     }
