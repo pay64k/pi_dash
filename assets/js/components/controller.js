@@ -84,11 +84,16 @@ class Controller extends React.Component {
     saveToLS("active_pids", this.state.active_pids)
   }
 
-  clear_all_pids(){
+  clear_all_pids() {
     this.pushOnChannel("status:stop_all_workers")
     saveToLS("active_pids", [])
     this.setState({ active_pids: [] })
     location.reload();
+  }
+
+  restart() {
+    this.pushOnChannel("application:restart")
+    setTimeout(location.reload.bind(location), 5000);
   }
 
   maybe_start_pid_worker_cb = (pid) => {
@@ -115,14 +120,17 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
-                  <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb}/>
+                  <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
                     maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
-                  <Button 
-                    onClick={() => this.clear_all_pids()} 
+                  <Button
+                    onClick={() => this.clear_all_pids()}
                     variant="secondary">Clear</Button>{' '}
+                  <Button
+                    onClick={() => this.restart()}
+                    variant="danger">Restart</Button>{' '}
                 </ButtonGroup>
               </div>
               <div className="col-sm">

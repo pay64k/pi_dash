@@ -18,6 +18,11 @@ defmodule PiDashWeb.RoomChannel do
     GenServer.cast(__MODULE__, {:send, data})
   end
 
+  def handle_in("application:restart", _params, _socket) do
+    Logger.warn("GUI initiated application restart.")
+    System.cmd("/home/#{System.get_env("USER")}/pi_dash/bin/pi_dash", ["restart"])
+  end
+
   def handle_in("status:supported_pids", _params, socket) do
     pids =
       Elm.Connector.get_supported_pids()
