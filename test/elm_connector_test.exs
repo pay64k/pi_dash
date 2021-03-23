@@ -20,6 +20,26 @@ defmodule ElmConnectorTest do
     assert full_configuration(context)
   end
 
+  test "restart on no response from ELM", _context do
+    Process.sleep(5500)
+    assert_wrote("AT Z")
+    Process.sleep(1000)
+  end
+
+  test "connect and restart after no response", context do
+    assert full_configuration(context)
+    Process.sleep(5500)
+    assert_wrote("AT Z")
+  end
+
+  test "connect and get NO DATA, then restart", context do
+    assert full_configuration(context)
+    Process.sleep(1000)
+    send_to_connector(">NO DATA", context)
+    Process.sleep(2000)
+    assert_wrote("AT Z")
+  end
+
   # TODO
   test "start and recieve some data", context do
     assert true == full_configuration(context)
