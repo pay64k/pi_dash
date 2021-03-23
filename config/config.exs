@@ -4,6 +4,7 @@ config :pi_dash,
   serial_port: "",
   supported_manufacturers: ["Prolific"],
   supported_serial_names: ["OBDII"],
+  connect_timeout: 5500,
   app_supported_pids: [
     %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100},
     %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},

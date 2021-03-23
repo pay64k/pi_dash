@@ -21,22 +21,21 @@ defmodule ElmConnectorTest do
   end
 
   test "restart on no response from ELM", _context do
-    Process.sleep(5500)
+    Process.sleep(Application.fetch_env!(:pi_dash, :connect_timeout) + 500)
     assert_wrote("AT Z")
     Process.sleep(1000)
   end
 
-  test "connect and restart after no response", context do
+  test "connect and dont restart after no response (no pids configured)", context do
     assert full_configuration(context)
-    Process.sleep(5500)
-    assert_wrote("AT Z")
+    Process.sleep(Application.fetch_env!(:pi_dash, :connect_timeout) + 500)
+    refute_wrote("AT Z")
   end
 
   test "connect and get NO DATA, then restart", context do
     assert full_configuration(context)
     Process.sleep(1000)
     send_to_connector(">NO DATA", context)
-    Process.sleep(2000)
     assert_wrote("AT Z")
   end
 
@@ -45,12 +44,7 @@ defmodule ElmConnectorTest do
     assert true == full_configuration(context)
     Process.sleep(1000)
     send_to_connector("486B10410C0F3251", context)
-  end
-
-  # TODO
-  test "supported pids", context do
-    assert true == full_configuration(context)
-    Elm.Connector.get_supported_pids() |> IO.inspect()
+    Process.sleep(1000)
   end
 
   # Private
@@ -103,7 +97,12 @@ defmodule ElmConnectorTest do
   end
 
   defp assert_wrote(msg) do
-    assert true == ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
+    assert ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
+    ExMeck.reset(Circuits.UART)
+  end
+
+  defp refute_wrote(msg) do
+    refute ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
     ExMeck.reset(Circuits.UART)
   end
 

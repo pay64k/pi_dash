@@ -23,8 +23,6 @@ defmodule Elm.Connector do
     "01" <> PT.name_to_pid(:pids_c)
   ]
 
-  @connect_timeout 5000
-
   def write_at_command(msg) do
     GenStateMachine.cast(__MODULE__, {:write, "AT " <> msg})
   end
@@ -46,10 +44,10 @@ defmodule Elm.Connector do
   end
 
   def init(_) do
+    Logger.debug("Starting #{__MODULE__} (init)")
     {:ok, uart_port_pid} = Circuits.UART.start_link()
-    tref = Process.send_after(self(), :connect_timeout, @connect_timeout)
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid, tref: tref}}
+    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid}}
   end
 
   def handle_event(
@@ -59,8 +57,7 @@ defmodule Elm.Connector do
         data = %Data{port: port}
       ) do
     Logger.error("ELM disconnected on #{port} in state: #{state}")
-    GenStateMachine.cast(__MODULE__, :open_connection)
-    {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
+    connect!(data)
   end
 
   def handle_event(:info, {:circuits_uart, port, ""}, _state, _data = %Data{port: port}) do
@@ -69,15 +66,13 @@ defmodule Elm.Connector do
 
   def handle_event(:info, {:circuits_uart, port, ">NO DATA"}, :connected_configured, data = %Data{port: port}) do
     Logger.error("Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Restarting...")
-    GenStateMachine.cast(__MODULE__, :open_connection)
-    {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
+    connect!(data)
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
     Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
-    Process.cancel_timer(data.tref)
-    tref = Process.send_after(self(), :connect_timeout, @connect_timeout)
+    tref = renew_timer(data.tref, :connect_timeout)
 
     msg
     |> prepare_received()
@@ -90,12 +85,15 @@ defmodule Elm.Connector do
     :keep_state_and_data
   end
 
+  def handle_event(:info, :connect_timeout, s = :connected_configured, data) do
+    # Logger.debug("We are connected, no need to re-connect.")
+    tref = renew_timer(data.tref, :connect_timeout)
+    {:next_state, s, %Data{data | tref: tref}}
+  end
+
   def handle_event(:info, :connect_timeout, state, data) do
     Logger.warn("Didn't get a response from ELM (state: #{state}). Restarting...")
-    Process.cancel_timer(data.tref)
-    tref = Process.send_after(self(), :connect_timeout, @connect_timeout)
-    GenStateMachine.cast(__MODULE__, :open_connection)
-    {:next_state, :connect, %Data{data | elm_queue: elm_opts(), last_sent_command: nil, tref: tref}}
+    connect!(data)
   end
 
   def handle_event({:call, from}, :get_supported_pids, state, data) do
@@ -119,24 +117,26 @@ defmodule Elm.Connector do
         case System.get_env("TEST_MODE", nil) do
           "true" ->
             start_pid_sup()
-            {:next_state, :connected_configured, %Data{data | port: port}}
+            tref = renew_timer(:connect_timeout)
+            {:next_state, :connected_configured, %Data{data | port: port, tref: tref}}
 
           nil ->
             write_at_command("Z")
-            {:next_state, :configuring, %Data{data | port: port, last_sent_command: "Z"}}
+            tref = renew_timer(:connect_timeout)
+            {:next_state, :configuring, %Data{data | port: port, last_sent_command: "Z", tref: tref}}
         end
 
       :error ->
         Process.sleep(5000)
         GenStateMachine.cast(__MODULE__, :open_connection)
-        :keep_state_and_data
+        {:next_state, :connect, %Data{data | tref: nil}}
     end
   end
 
   defp handle_msg(msg, :configuring, data) do
     cond do
       String.contains?(msg, "Z") and data.last_sent_command == "Z" ->
-        {:keep_state, %Data{data | tref: nil}}
+        :keep_state_and_data
 
       String.contains?(msg, "ELM") and data.last_sent_command == "Z" ->
         Logger.info("Connected ELM version: #{msg}")
@@ -170,8 +170,7 @@ defmodule Elm.Connector do
 
       String.contains?(msg, "UNABLE TO CONNECT") ->
         Logger.error("Unable to connect to vehicle ECU! Restarting...")
-        GenStateMachine.cast(__MODULE__, :open_connection)
-        {:next_state, :connect, %Data{data | elm_queue: elm_opts()}}
+        connect!(data)
 
       data.last_sent_command in @obd_pids_supported ->
         next = {!String.contains?(msg, "NO DATA"), Enum.count(data.elm_queue) > 0}
@@ -231,6 +230,25 @@ defmodule Elm.Connector do
         send(pid, {:process, to_send})
         :keep_state_and_data
     end
+  end
+
+  defp connect!(data) do
+    GenStateMachine.cast(__MODULE__, :open_connection)
+    tref = renew_timer(data.tref, :connect_timeout)
+    {:next_state, :connect, %Data{data | elm_queue: elm_opts(), tref: tref}}
+  end
+
+  defp renew_timer(msg = :connect_timeout) do
+    Process.send_after(self(), msg, connect_timeout())
+  end
+
+  defp renew_timer(old_ref, msg = :connect_timeout) do
+    renew_timer(old_ref, msg, connect_timeout())
+  end
+
+  defp renew_timer(old_ref, msg, timeout) do
+    Process.cancel_timer(old_ref)
+    Process.send_after(self(), msg, timeout)
   end
 
   defp prepare_received(msg) do
@@ -314,6 +332,10 @@ defmodule Elm.Connector do
         # TODO handle :eagain
         :error
     end
+  end
+
+  defp connect_timeout() do
+    Application.fetch_env!(:pi_dash, :connect_timeout)
   end
 
   def start_pid_sup() do
