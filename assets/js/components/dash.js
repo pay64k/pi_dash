@@ -27,9 +27,18 @@ class Dash extends React.Component {
     if (this.props.active_pids !== prevProps.active_pids) {
       this.setState({ active_pids: prevProps.active_pids });
     }
-
   }
-// TODO pick gauge type: linear, circle etc
+
+  gaugeTypeToComponent(props) {
+    let p = {...props, channel: this.channel}
+    switch (props.active_gauge) {
+      case "linear":
+        return <LinearGauge {...p}/>;
+      case "linear2":
+        return <LinearGauge2 {...p}/>;
+    }
+  }
+
   render() {
     return (
       <ResponsiveReactGridLayout
@@ -43,11 +52,7 @@ class Dash extends React.Component {
       >
         {this.state.active_pids.map((pid) => (
           <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
-            <LinearGauge2 
-            name={pid.obd_pid_name} 
-            min_value={pid.min_value}
-            max_value={pid.max_value} 
-            channel={this.channel} />
+            {this.gaugeTypeToComponent(pid)}
           </div>
         ))}
       </ResponsiveReactGridLayout>

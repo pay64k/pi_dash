@@ -28,21 +28,25 @@ class LinearGauge2 extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.name, "did mount")
-        this.props.channel.on("update:" + this.props.name, (message) => {
+        this.props.channel.on("update:" + this.props.obd_pid_name, (message) => {
 
             this.setState({ value: message.value, color: this.getColor(message.value) })
         });
     }
 
     componentWillUnmount() {
-        console.log(this.props.name, "will unmount")
-        this.props.channel.off("update:" + this.props.name)
+        this.props.channel.off("update:" + this.props.obd_pid_name)
     }
 
     calculateWidth(value) {
         return Math.round((value - this.props.min_value) * (100 - 0) / (this.props.max_value - this.props.min_value) + 0);
         // (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+    getColor(value) {
+        // from black to red
+        var lightness = (value * 45 / this.props.max_value).toString(10);
+        return ["hsl(0,100%,", lightness - 10, "%)"].join("");
     }
 
     render() {
@@ -63,7 +67,7 @@ class LinearGauge2 extends React.Component {
                         mixBlendMode: "difference"
                     }}
                 >
-                    {this.props.name}
+                    {this.props.obd_pid_name}
                 </Typography>
                 <Typography
                     style={{

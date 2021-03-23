@@ -4,8 +4,10 @@ import Clock from './clock'
 import Interval from './interval'
 import Dash from "./dash";
 import PidsDropdown from "./pids_dropdown"
+import GaugeSelection from "./gauge_selection"
 
 const active_pids = getFromLS("active_pids") || [];
+const gauges = ["linear", "linear2"]
 
 class Controller extends React.Component {
   constructor(props) {
@@ -15,7 +17,8 @@ class Controller extends React.Component {
       elm_status: "unknown",
       supported_pids: [],
       active_pids: JSON.parse(JSON.stringify(active_pids)),
-      active_interval: 1000
+      active_interval: 1000,
+      active_gauge: "linear"
     };
   }
 
@@ -68,6 +71,7 @@ class Controller extends React.Component {
 
     if (!exists) {
       pid["interval"] = this.state.active_interval
+      pid["active_gauge"] = this.state.active_gauge
       this.state.active_pids.push(pid)
     }
 
@@ -91,6 +95,10 @@ class Controller extends React.Component {
     this.maybe_start_pid_worker(pid)
   }
 
+  update_active_gauge_cb = (new_gauge) => {
+    this.setState({ active_gauge: new_gauge });
+  }
+
   update_active_interval_cb = (new_interval) => {
     this.setState({ active_interval: new_interval });
   }
@@ -107,6 +115,7 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
+                  <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb}/>
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
