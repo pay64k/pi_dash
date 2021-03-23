@@ -5,7 +5,7 @@ use Mix.Config
 #   cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :logger,
-  level: :info,
+  level: System.get_env("LOG_LEVEL", "info") |> String.to_atom,
   backends: [{Loggix, :logger_file_backend}]
 
 config :logger, :logger_file_backend,
