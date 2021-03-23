@@ -1,9 +1,6 @@
 name: build_on_rpi4
 
 on:
-  pull_request:
-    branches: [ main ]
-
   workflow_dispatch:
 
 jobs:

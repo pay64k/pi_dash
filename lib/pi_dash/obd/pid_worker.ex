@@ -63,5 +63,5 @@ defmodule Obd.PidWorker do
     {:noreply, state}
   end
 
-  defp format_msg_to_web(value, state), do: %{value: value, obd_pid_name: state.obd_pid_name}
+  defp format_msg_to_web(value, state), do: %{value: round(value), obd_pid_name: state.obd_pid_name}
 end

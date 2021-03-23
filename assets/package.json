@@ -7,6 +7,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
     "bootstrap": "^4.6.0",
     "loadingio-bar": "^0.1.1",
     "phoenix": "file:../deps/phoenix",

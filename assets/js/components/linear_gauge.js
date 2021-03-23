@@ -10,10 +10,10 @@ class LinearGauge extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.name, "did mount")
-        this.props.channel.on("update:" + this.props.name, (message) => {
-            // console.log("update in gauge " + this.props.name, message)
-            var canvas = document.getElementById(this.props.name);
+        console.log(this.props.obd_pid_name, "did mount")
+        this.props.channel.on("update:" + this.props.obd_pid_name, (message) => {
+            // console.log("update in gauge " + this.props.obd_pid_name, message)
+            var canvas = document.getElementById(this.props.obd_pid_name);
             var ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.fillStyle = this.getColor(message.value);
@@ -23,8 +23,7 @@ class LinearGauge extends React.Component {
     }
 
     componentWillUnmount(){
-        console.log(this.props.name, "will unmount")
-        this.props.channel.off("update:" + this.props.name)
+        this.props.channel.off("update:" + this.props.obd_pid_name)
     }
 
     calculateWidth(value, canvas) {
@@ -53,9 +52,9 @@ class LinearGauge extends React.Component {
         };
         return (
             <div style={divStyle}>
-                <canvas id={this.props.name} style={canvasStyle}></canvas>
+                <canvas id={this.props.obd_pid_name} style={canvasStyle}></canvas>
                 <div style={footerStyle}>
-                    {this.props.name} {this.state.value}
+                    {this.props.obd_pid_name} {this.state.value}
                 </div>
             </div>
         )
