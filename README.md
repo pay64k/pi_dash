@@ -1,4 +1,3 @@
-[![build_on_rpi4](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml)
 [![CI](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml)
 
 # pi_dash - automotive (rally) dash written in Elixir and React that runs on Raspberry Pi
