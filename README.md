@@ -30,15 +30,30 @@ or
 for detached mode.
 
 ## Configuration
-### Run on specific serial port
-If pi_dash doesn't find a supported ELM device to connect to it will try on specific serial port. If your ELM device is not supported (e.g. does not auto-detect) you can edit
+Custom configuration parameters are located in
 ```
 /home/$USER/pi_dash/releases/x.x.x/env.sh
 ```
-
-and change `SERIAL_PORT` environment variable to you port, for example:
+### Run on specific serial port
+If pi_dash doesn't find a supported ELM device to connect to it will try on specific serial port. If your ELM device is not supported (e.g. does not auto-detect) you can edit the `env.sh` file and change `SERIAL_PORT` environment variable to you port, for example:
 ```
 export SERIAL_PORT="/dev/pts/2"
+```
+### Max RPM (default 6500)
+Since all cars are different it is possible to set your own value for maximum RPM your engine can have.
+In `env.sh` change the value to match your car:
+```
+export MAX_RPM=6500
+```
+### Debug logs
+For problems reporting and debugging in "production" you can change `LOG_LEVEL` variable to debug:
+```
+export LOG_LEVEL=debug
+```
+If you do so you need to stop and start the application:
+```
+./home/$USER/pi_dash/bin/pi_dash stop
+./home/$USER/pi_dash/bin/pi_dash start
 ```
 ### Raspberry Pi configuration
 [OS installation](https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup)
