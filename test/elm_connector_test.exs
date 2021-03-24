@@ -57,6 +57,7 @@ defmodule ElmConnectorTest do
     timeout()
     send_to_connector(">NO DATA", context)
     assert_wrote("AT Z")
+    Process.sleep(100)
   end
 
   test "start and recieve some data - sunny day", context do

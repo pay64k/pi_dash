@@ -7,13 +7,14 @@ defmodule Elm.Data do
     :last_sent_command,
     :protocol_number,
     supported_pids: [],
-    tref: nil
+    tref: nil,
+    extra_logging: false
   ]
 end
 
 defmodule Elm.Connector do
   use GenStateMachine
-  alias Elm.{Data,Utils}
+  alias Elm.{Data, Utils}
   alias Obd.PidTranslator, as: PT
   require Logger
 
@@ -46,8 +47,11 @@ defmodule Elm.Connector do
   def init(_) do
     Logger.debug("Starting #{__MODULE__} (init)")
     {:ok, uart_port_pid} = Circuits.UART.start_link()
+    extra_logging = Application.fetch_env!(:pi_dash, :extra_logging)
     GenStateMachine.cast(__MODULE__, :open_connection)
-    {:ok, :connect, %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid}}
+
+    {:ok, :connect,
+     %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid, extra_logging: extra_logging}}
   end
 
   def handle_event(
@@ -64,38 +68,40 @@ defmodule Elm.Connector do
     :keep_state_and_data
   end
 
-  def handle_event(:info, {:circuits_uart, port, ">NO DATA"}, :connected_configured, data = %Data{port: port}) do
-    Logger.error("Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting connect timer...")
+  def handle_event(
+        :info,
+        {:circuits_uart, port, ">NO DATA"},
+        :connected_configured,
+        data = %Data{port: port}
+      ) do
+    Logger.error(
+      "Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting connect timer..."
+    )
+
     tref = renew_timer(:connect_timeout)
+    Obd.PidSup.stop_all_workers()
     {:next_state, :connected_configured, %Data{data | tref: tref}}
-    # Obd.PidSup.stop_all_workers()
-    # connect!(data)
   end
 
-  def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
-    # Logger.info("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
-    Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
-
-    # tref = renew_timer(data.tref, :connect_timeout)
+  def handle_event(
+        :info,
+        {:circuits_uart, port, msg},
+        state,
+        data = %Data{port: port, extra_logging: extra_logging}
+      ) do
+    if extra_logging, do: Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
     msg
     |> prepare_received()
     |> handle_msg(state, data)
-    # |> handle_msg(state, %Data{data | tref: tref})
   end
 
-  def handle_event(:cast, {:write, msg}, state, data) do
-    # Logger.info("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
-    Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
+  def handle_event(:cast, {:write, msg}, state, data = %Data{extra_logging: extra_logging}) do
+    if extra_logging, do: Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
+
     :ok = Circuits.UART.write(data.uart_port_pid, msg)
     :keep_state_and_data
   end
-
-  # def handle_event(:info, :connect_timeout, s = :connected_configured, data) do
-  #   Logger.debug("We are connected, no need to re-connect.")
-  #   tref = renew_timer(data.tref, :connect_timeout)
-  #   {:next_state, s, %Data{data | tref: tref}}
-  # end
 
   def handle_event(:info, :connect_timeout, state, data) do
     Logger.warn("Didn't get a response from ELM (state: #{state}). Restarting...")
@@ -127,7 +133,9 @@ defmodule Elm.Connector do
           nil ->
             write_at_command("Z")
             tref = renew_timer(:connect_timeout)
-            {:next_state, :configuring, %Data{data | port: port, last_sent_command: "Z", tref: tref}}
+
+            {:next_state, :configuring,
+             %Data{data | port: port, last_sent_command: "Z", tref: tref}}
         end
 
       :error ->
@@ -162,7 +170,13 @@ defmodule Elm.Connector do
         tref = renew_timer(data.tref, :connect_timeout)
 
         {:next_state, :get_supported_pids,
-         %Data{data | protocol_number: msg, last_sent_command: to_send, elm_queue: rest, tref: tref}}
+         %Data{
+           data
+           | protocol_number: msg,
+             last_sent_command: to_send,
+             elm_queue: rest,
+             tref: tref
+         }}
 
       true ->
         :keep_state_and_data
@@ -174,7 +188,6 @@ defmodule Elm.Connector do
       String.contains?(msg, "SEARCHING") ->
         tref = renew_timer(data.tref, :connect_timeout)
         {:next_state, :get_supported_pids, %Data{data | tref: tref}}
-        # :keep_state_and_data
 
       String.contains?(msg, "UNABLE TO CONNECT") ->
         Logger.error("Unable to connect to vehicle ECU! Restarting...")
@@ -199,7 +212,6 @@ defmodule Elm.Connector do
             Process.cancel_timer(data.tref)
 
             Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
-            # start_pid_sup()
             {:next_state, :connected_configured, data}
 
           {true, true} ->
@@ -223,7 +235,6 @@ defmodule Elm.Connector do
             Process.cancel_timer(data.tref)
             supported = Obd.DataTranslator.parse_supported_pids(msg)
             pretty_log_supported_pids(supported)
-            # start_pid_sup()
 
             {
               :next_state,
@@ -235,7 +246,6 @@ defmodule Elm.Connector do
   end
 
   defp handle_msg(msg, :connected_configured, _data) do
-
     translated =
       case Obd.DataTranslator.decode_data(msg) do
         :error -> nil
@@ -256,7 +266,9 @@ defmodule Elm.Connector do
   defp connect!(data) do
     GenStateMachine.cast(__MODULE__, :open_connection)
     tref = renew_timer(data.tref, :connect_timeout)
-    {:next_state, :connect, %Data{uart_port_pid: data.uart_port_pid, elm_queue: elm_opts(), tref: tref}}
+
+    {:next_state, :connect,
+     %Data{uart_port_pid: data.uart_port_pid, elm_queue: elm_opts(), tref: tref}}
   end
 
   defp renew_timer(msg = :connect_timeout) do
@@ -359,25 +371,10 @@ defmodule Elm.Connector do
     Application.fetch_env!(:pi_dash, :connect_timeout)
   end
 
-  # def start_pid_sup() do
-  #   child = [
-  #     %{
-  #       id: Obd.PidSup,
-  #       start: {Obd.PidSup, :start_link, []}
-  #     }
-  #   ]
-
-  #   opts = [strategy: :one_for_one, max_restarts: 0]
-  #   {:ok, pid} = Supervisor.start_link(child, opts)
-  #   pid
-  # end
-
   defp pretty_log_supported_pids(pids) do
-    pretty =
-      for p <- pids, do: Obd.PidTranslator.pid_to_name(p)
+    pretty = for p <- pids, do: Obd.PidTranslator.pid_to_name(p)
 
     Logger.info("Supported PIDs hex: #{inspect(pids)}")
     Logger.info("Supported PIDs names: #{inspect(pretty, limit: :infinity, pretty: true)}")
   end
-
 end

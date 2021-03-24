@@ -50,11 +50,18 @@ For problems reporting and debugging in "production" you can change `LOG_LEVEL` 
 ```
 export LOG_LEVEL=debug
 ```
-If you do so you need to stop and start the application:
+In order to see extra stuff like how the message is decoded and what are the translated values, change this to true:
+```
+export EXTRA_LOGGING=true
+```
+
+If you cahnge any values in `env.sh`, you need to restart the application with:
 ```
 ./home/$USER/pi_dash/bin/pi_dash stop
-./home/$USER/pi_dash/bin/pi_dash start
+./home/$USER/pi_dash/bin/pi_dash daemon
 ```
+or reboot your Raspberry Pi.
+
 ### Raspberry Pi configuration
 [OS installation](https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup)
 

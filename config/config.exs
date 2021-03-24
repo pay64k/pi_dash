@@ -5,6 +5,7 @@ config :pi_dash,
   supported_manufacturers: ["Prolific"],
   supported_serial_names: ["OBDII"],
   connect_timeout: 5500,
+  extra_logging: System.get_env("EXTRA_LOGGING", "false") |> String.to_existing_atom(),
   app_supported_pids: [
     %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100},
     %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},

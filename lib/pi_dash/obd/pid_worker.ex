@@ -6,11 +6,11 @@ defmodule Obd.PidWorker do
   # Show current data
   @obd_mode "01"
 
-  def start_link(obd_pid_name, interval \\ 1000) do
-    GenServer.start(__MODULE__, [obd_pid_name, interval], name: obd_pid_name)
+  def start_link(obd_pid_name, extra_logging, interval \\ 1000) do
+    GenServer.start(__MODULE__, [obd_pid_name, interval, extra_logging], name: obd_pid_name)
   end
 
-  def init(opts = [obd_pid_name, interval]) do
+  def init(opts = [obd_pid_name, interval, extra_logging]) do
     Logger.info("Starting #{inspect(__MODULE__)} with opts: #{inspect(opts)}")
     {:ok, tref} = :timer.send_interval(interval, self(), :write)
     obd_pid_hex_string = Obd.PidTranslator.name_to_pid(obd_pid_name)
@@ -21,7 +21,8 @@ defmodule Obd.PidWorker do
        obd_pid_hex_string: obd_pid_hex_string,
        interval: interval,
        tref: tref,
-       last_value: 0
+       last_value: 0,
+       extra_logging: extra_logging
      }}
   end
 
@@ -32,13 +33,15 @@ defmodule Obd.PidWorker do
 
   def handle_info(
         {:process, msg},
-        state = %{last_value: last_value}
+        state = %{last_value: last_value, extra_logging: extra_logging}
       ) do
-    Logger.debug(
-      "Pid worker #{inspect(state.obd_pid_name)} recieved data: #{
-        inspect(msg.data, binaries: :as_binaries)
-      }"
-    )
+    if extra_logging,
+      do:
+        Logger.debug(
+          "Pid worker #{inspect(state.obd_pid_name)} recieved data: #{
+            inspect(msg.data, binaries: :as_binaries)
+          }"
+        )
 
     case Obd.DataTranslator.handle_data(msg) do
       {:error, reason} ->
@@ -52,7 +55,12 @@ defmodule Obd.PidWorker do
         {:noreply, state}
 
       value ->
-        Logger.debug("obd pid worker #{state.obd_pid_name} translated data: #{inspect(value)}")
+        if extra_logging,
+          do:
+            Logger.debug(
+              "obd pid worker #{state.obd_pid_name} translated data: #{inspect(value)}"
+            )
+
         to_web = format_msg_to_web(value, state)
         PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
         {:noreply, %{state | last_value: value}}
@@ -63,5 +71,6 @@ defmodule Obd.PidWorker do
     {:noreply, state}
   end
 
-  defp format_msg_to_web(value, state), do: %{value: round(value), obd_pid_name: state.obd_pid_name}
+  defp format_msg_to_web(value, state),
+    do: %{value: round(value), obd_pid_name: state.obd_pid_name}
 end
