@@ -222,15 +222,20 @@ defmodule Elm.Connector do
   end
 
   defp handle_msg(msg, :connected_configured, _data) do
-    to_send = %{obd_pid_name: obd_pid_name} = Obd.DataTranslator.decode_data(msg)
-    res = Process.whereis(obd_pid_name)
 
-    case res do
+    translated =
+      case Obd.DataTranslator.decode_data(msg) do
+        :error -> nil
+        t -> t
+      end
+
+    case translated do
       nil ->
         :keep_state_and_data
 
-      pid ->
-        send(pid, {:process, to_send})
+      %{obd_pid_name: obd_pid_name} ->
+        pid = Process.whereis(obd_pid_name)
+        send(pid, {:process, translated})
         :keep_state_and_data
     end
   end
