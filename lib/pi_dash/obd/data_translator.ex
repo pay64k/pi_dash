@@ -3,8 +3,8 @@ defmodule Obd.DataTranslator do
 
   def decode_data(hex_string) do
     <<header::24, mode::8, pid::8, data_and_crc::binary>> = Base.decode16!(hex_string)
-    Logger.debug("decoded data for #{hex_string}:
-       header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{inspect(Base.encode16(<<mode::8>>))}, pid: #{inspect(Base.encode16(<<pid::8>>))}")
+    # Logger.debug("decoded data for #{hex_string}:
+    #    header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{inspect(Base.encode16(<<mode::8>>))}, pid: #{inspect(Base.encode16(<<pid::8>>))}")
 
     obd_pid_name =
       <<pid::8>>

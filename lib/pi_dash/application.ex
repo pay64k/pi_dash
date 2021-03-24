@@ -21,6 +21,10 @@ defmodule PiDash.Application do
       %{
         id: Elm.Connector,
         start: {Elm.Connector, :start_link, []}
+      },
+      %{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, []}
       }
     ]
 

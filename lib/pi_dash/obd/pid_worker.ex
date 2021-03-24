@@ -34,11 +34,11 @@ defmodule Obd.PidWorker do
         {:process, msg},
         state = %{last_value: last_value}
       ) do
-    Logger.debug(
-      "Pid worker #{inspect(state.obd_pid_name)} recieved data: #{
-        inspect(msg.data, binaries: :as_binaries)
-      }"
-    )
+    # Logger.debug(
+    #   "Pid worker #{inspect(state.obd_pid_name)} recieved data: #{
+    #     inspect(msg.data, binaries: :as_binaries)
+    #   }"
+    # )
 
     case Obd.DataTranslator.handle_data(msg) do
       {:error, reason} ->
@@ -52,7 +52,7 @@ defmodule Obd.PidWorker do
         {:noreply, state}
 
       value ->
-        Logger.debug("obd pid worker #{state.obd_pid_name} translated data: #{inspect(value)}")
+        # Logger.debug("obd pid worker #{state.obd_pid_name} translated data: #{inspect(value)}")
         to_web = format_msg_to_web(value, state)
         PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
         {:noreply, %{state | last_value: value}}
