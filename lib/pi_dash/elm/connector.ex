@@ -65,7 +65,7 @@ defmodule Elm.Connector do
   end
 
   def handle_event(:info, {:circuits_uart, port, ">NO DATA"}, :connected_configured, data = %Data{port: port}) do
-    Logger.error("Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting conenct timer ...")
+    Logger.error("Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting connect timer...")
     tref = renew_timer(:connect_timeout)
     {:next_state, :connected_configured, %Data{data | tref: tref}}
     # Obd.PidSup.stop_all_workers()

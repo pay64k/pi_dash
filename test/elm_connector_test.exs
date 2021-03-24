@@ -3,24 +3,27 @@ defmodule ElmConnectorTest do
 
   setup do
     ExMeck.new(PiDashWeb.RoomChannel, [:passthrough])
+    ExMeck.expect(PiDashWeb.RoomChannel, :send_to_channel, fn _, _ -> :ok end)
 
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :enumerate, fn -> %{"port" => %{manufacturer: "Prolific"}} end)
 
-    pid = start_connector()
+    elm_pid = start_connector()
 
     {:ok, _pid} = start_supervised(%{
       id: Obd.PidSup,
       start: {Obd.PidSup, :start_link, []}
     })
 
+    Car.start_link(elm_pid)
+
     on_exit(fn ->
       ExMeck.unload()
     end)
 
-    {:ok, connector_pid: pid, serial_port: "port"}
+    {:ok, elm_pid: elm_pid, serial_port: "port"}
   end
 
   test "sunny day - full configuration ok", context do
@@ -49,19 +52,34 @@ defmodule ElmConnectorTest do
     assert_wrote("AT Z")
   end
 
-  test "start and recieve some data", context do
-    ExMeck.expect(PiDashWeb.RoomChannel, :send_to_channel, fn _, _ -> :ok end)
+  test "start and recieve some data - sunny day", context do
 
-    assert true == full_configuration(context)
+    assert full_configuration(context)
 
     Obd.PidSup.start_pid_worker(:rpm)
     assert_state(:connected_configured)
 
     refute_wrote("AT Z")
-    send_to_connector("486B10410C0F3251", context)
+    Car.start_sending(:rpm, 100)
+    refute_wrote("AT Z")
+    Process.sleep(200)
+    assert ExMeck.contains?(PiDashWeb.RoomChannel, {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_})
+  end
+
+  test "start and receive data then get NO DATA and resume connection", context do
+    assert full_configuration(context)
+
+    Obd.PidSup.start_pid_worker(:rpm)
+    assert_state(:connected_configured)
+
     refute_wrote("AT Z")
 
-    assert ExMeck.contains?(PiDashWeb.RoomChannel, {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_})
+    Car.start_sending(:rpm, 300)
+    Process.sleep(2000)
+    Car.stop_sending(:rpm)
+
+    send_to_connector(">NO DATA", context)
+    assert true == full_configuration(context)
   end
 
   # Private
@@ -103,7 +121,7 @@ defmodule ElmConnectorTest do
   end
 
   defp send_to_connector(msg, context) do
-    pid = context[:connector_pid]
+    pid = context[:elm_pid]
     port = context[:serial_port]
     send(pid, {:circuits_uart, port, msg})
   end
