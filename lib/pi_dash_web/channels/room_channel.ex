@@ -20,6 +20,7 @@ defmodule PiDashWeb.RoomChannel do
 
   def handle_in("application:restart", _params, socket) do
     Logger.warn("GUI initiated application restart.")
+    Obd.PidSup.stop_all_workers()
     System.cmd("/home/#{System.get_env("USER")}/pi_dash/bin/pi_dash", ["restart"])
     {:noreply, socket}
   end

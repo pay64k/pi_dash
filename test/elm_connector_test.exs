@@ -2,12 +2,19 @@ defmodule ElmConnectorTest do
   use ExUnit.Case
 
   setup do
+    ExMeck.new(PiDashWeb.RoomChannel, [:passthrough])
+
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :enumerate, fn -> %{"port" => %{manufacturer: "Prolific"}} end)
 
     pid = start_connector()
+
+    {:ok, _pid} = start_supervised(%{
+      id: Obd.PidSup,
+      start: {Obd.PidSup, :start_link, []}
+    })
 
     on_exit(fn ->
       ExMeck.unload()
@@ -20,40 +27,55 @@ defmodule ElmConnectorTest do
     assert full_configuration(context)
   end
 
-  test "restart on no response from ELM", _context do
-    Process.sleep(Application.fetch_env!(:pi_dash, :connect_timeout) + 500)
+  test "restart on no response from ELM in connect state", _context do
+    assert_state(:configuring)
     assert_wrote("AT Z")
-    Process.sleep(1000)
+    timeout()
+    assert_wrote("AT Z")
+    assert_state(:configuring)
   end
 
   test "connect and dont restart after no response (no pids configured)", context do
     assert full_configuration(context)
-    Process.sleep(Application.fetch_env!(:pi_dash, :connect_timeout) + 500)
+    timeout()
     refute_wrote("AT Z")
+    assert_state(:connected_configured)
   end
 
   test "connect and get NO DATA, then restart", context do
     assert full_configuration(context)
-    Process.sleep(1000)
+    timeout()
     send_to_connector(">NO DATA", context)
     assert_wrote("AT Z")
   end
 
-  # TODO
   test "start and recieve some data", context do
+    ExMeck.expect(PiDashWeb.RoomChannel, :send_to_channel, fn _, _ -> :ok end)
+
     assert true == full_configuration(context)
-    Process.sleep(1000)
+
+    Obd.PidSup.start_pid_worker(:rpm)
+    assert_state(:connected_configured)
+
+    refute_wrote("AT Z")
     send_to_connector("486B10410C0F3251", context)
-    Process.sleep(1000)
+    refute_wrote("AT Z")
+
+    assert ExMeck.contains?(PiDashWeb.RoomChannel, {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_})
   end
 
   # Private
 
+  defp timeout() do
+    delay = Application.fetch_env!(:pi_dash, :connect_timeout) + 100
+    Process.sleep(delay)
+  end
+
   defp full_configuration(context) do
     assert_wrote("AT Z")
-    assert get_state() == :configuring
+    assert_state(:configuring)
     send_to_connector("ELM v1.5", context)
-    assert get_state() == :configuring
+    assert_state(:configuring)
     send_to_connector("OK", context)
     assert_wrote("AT E0")
     send_to_connector("OK", context)
@@ -69,14 +91,14 @@ defmodule ElmConnectorTest do
     send_to_connector("OK", context)
     assert_wrote("AT DPN")
     send_to_connector("A0", context)
-    assert get_state() == :get_supported_pids
+    assert_state(:get_supported_pids)
     assert_wrote("0100")
     send_to_connector("486B104100BE1FA813C9", context)
     assert_wrote("0120")
     send_to_connector("486B104120BE1FAFF3C9", context)
     assert_wrote("0140")
     send_to_connector("486B104140BE1FAA13C9", context)
-    assert get_state() == :connected_configured
+    assert_state(:connected_configured)
     true
   end
 
@@ -104,6 +126,10 @@ defmodule ElmConnectorTest do
   defp refute_wrote(msg) do
     refute ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
     ExMeck.reset(Circuits.UART)
+  end
+
+  defp assert_state(state) do
+    assert state == get_state()
   end
 
   defp get_state() do
