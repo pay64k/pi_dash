@@ -12,12 +12,19 @@ defmodule ElmConnectorTest do
 
     elm_pid = start_connector()
 
-    {:ok, _pid} = start_supervised(%{
-      id: Obd.PidSup,
-      start: {Obd.PidSup, :start_link, []}
-    })
+    {:ok, _pid} =
+      start_supervised(%{
+        id: Obd.PidSup,
+        start: {Obd.PidSup, :start_link, []}
+      })
 
-    Car.start_link(elm_pid)
+    {:ok, _pid} =
+      start_supervised(%{
+        id: Car,
+        start: {Car, :start_link, [elm_pid]}
+      })
+
+    # Car.start_link(elm_pid)
 
     on_exit(fn ->
       ExMeck.unload()
@@ -53,7 +60,6 @@ defmodule ElmConnectorTest do
   end
 
   test "start and recieve some data - sunny day", context do
-
     assert full_configuration(context)
 
     Obd.PidSup.start_pid_worker(:rpm)
@@ -63,7 +69,11 @@ defmodule ElmConnectorTest do
     Car.start_sending(:rpm, 100)
     refute_wrote("AT Z")
     Process.sleep(200)
-    assert ExMeck.contains?(PiDashWeb.RoomChannel, {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_})
+
+    assert ExMeck.contains?(
+             PiDashWeb.RoomChannel,
+             {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_}
+           )
   end
 
   test "start and receive data then get NO DATA and resume connection", context do
