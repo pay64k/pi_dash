@@ -70,7 +70,7 @@ defmodule Elm.Connector do
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
-    # Logger.info("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
+    Logger.info("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
     # Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
     # tref = renew_timer(data.tref, :connect_timeout)
@@ -243,7 +243,7 @@ defmodule Elm.Connector do
   defp connect!(data) do
     GenStateMachine.cast(__MODULE__, :open_connection)
     tref = renew_timer(data.tref, :connect_timeout)
-    {:next_state, :connect, %Data{data | elm_queue: elm_opts(), tref: tref}}
+    {:next_state, :connect, %Data{elm_queue: elm_opts(), tref: tref}}
   end
 
   defp renew_timer(msg = :connect_timeout) do
