@@ -79,7 +79,7 @@ defmodule ElmConnectorTest do
     Car.stop_sending(:rpm)
 
     send_to_connector(">NO DATA", context)
-    assert true == full_configuration(context)
+    assert full_configuration(context)
   end
 
   # Private
