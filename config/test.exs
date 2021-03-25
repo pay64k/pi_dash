@@ -5,6 +5,7 @@ config :pi_dash, PiDashWeb.Endpoint,
   server: false
 
 config :pi_dash,
-  connect_timeout: 100
+  connect_timeout: 100,
+  nudge_interval: 200
 
 config :logger, level: :debug

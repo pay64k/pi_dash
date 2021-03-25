@@ -8,9 +8,7 @@ defmodule Elm.Data do
     :protocol_number,
     supported_pids: [],
     tref: nil,
-    extra_logging: false,
-    nudging: false,
-    nudge_tref: nil
+    extra_logging: false
   ]
 end
 
@@ -25,8 +23,6 @@ defmodule Elm.Connector do
     "01" <> PT.name_to_pid(:pids_b),
     "01" <> PT.name_to_pid(:pids_c)
   ]
-
-  @nudge_period 10000
 
   def write_at_command(msg) do
     GenStateMachine.cast(__MODULE__, {:write, "AT " <> msg})
@@ -53,13 +49,11 @@ defmodule Elm.Connector do
     {:ok, uart_port_pid} = Circuits.UART.start_link()
     extra_logging = Application.fetch_env!(:pi_dash, :extra_logging)
     GenStateMachine.cast(__MODULE__, :open_connection)
-    nudge_tref = Process.send_after(self(), :nudge, @nudge_period)
 
     {:ok, :connect,
      %Data{
        elm_queue: elm_opts(),
        uart_port_pid: uart_port_pid,
-       nudge_tref: nudge_tref,
        extra_logging: extra_logging
      }}
   end
@@ -74,40 +68,15 @@ defmodule Elm.Connector do
     connect!(data)
   end
 
-  def handle_event(:info, {:circuits_uart, port, ""}, _state, _data = %Data{port: port}) do
+  def handle_event(:info, {:circuits_uart, port, ""}, _state, %Data{port: port}) do
     :keep_state_and_data
   end
 
-  def handle_event(
-        :info,
-        {:circuits_uart, port, ">NO DATA"},
-        :connected_configured,
-        data = %Data{port: port, nudging: nudging}
-      ) do
-    if nudging do
-      Logger.debug("Still nudging workers...")
-      :keep_state_and_data
-    else
-      Logger.warn("Got NO DATA, nudge workers!")
-      Elm.PidSup.nudge_workers(self())
-      {:next_state, :connected_configured, %Data{data | nudging: true}}
-    end
-  end
-
-  def handle_event(:info, :done_nudging, state, data) do
-    Logger.debug("Done nudging")
-    {:next_state, state, %Data{data | nudging: false}}
-  end
-
-  def handle_event(:info, :nudge, state, data = %Data{nudging: nudging}) do
-    if nudging do
-      :keep_state_and_data
-    else
-      Logger.debug("Self initiated worker nudge.")
-      Elm.PidSup.nudge_workers(self())
-      nudge_tref = renew_timer(data.nudge_tref, :nudge, @nudge_period)
-      {:next_state, state, %Data{data | nudge_tref: nudge_tref, nudging: true}}
-    end
+  def handle_event(:info, {:circuits_uart, port, ">NO DATA"}, s = :connected_configured, %Data{
+        port: port
+      }) do
+    Logger.warn("Got NO DATA in #{s}!")
+    :keep_state_and_data
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
@@ -157,7 +126,7 @@ defmodule Elm.Connector do
 
           nil ->
             write_at_command("Z")
-            tref = renew_timer(:connect_timeout)
+            tref = Elm.Utils.renew_timer(:connect_timeout)
 
             {:next_state, :configuring,
              %Data{data | port: port, last_sent_command: "Z", tref: tref}}
@@ -196,7 +165,7 @@ defmodule Elm.Connector do
         {to_send, rest} = List.pop_at(@obd_pids_supported, 0)
         write_command(to_send)
 
-        tref = renew_timer(data.tref, :connect_timeout)
+        tref = Elm.Utils.renew_timer(data.tref, :connect_timeout)
 
         {:next_state, :get_supported_pids,
          %Data{
@@ -215,7 +184,7 @@ defmodule Elm.Connector do
   defp handle_msg(msg, :get_supported_pids, data) do
     cond do
       String.contains?(msg, "SEARCHING") ->
-        tref = renew_timer(data.tref, :connect_timeout)
+        tref = Elm.Utils.renew_timer(data.tref, :connect_timeout)
         {:next_state, :get_supported_pids, %Data{data | tref: tref}}
 
       String.contains?(msg, "UNABLE TO CONNECT") ->
@@ -228,7 +197,7 @@ defmodule Elm.Connector do
 
         case next do
           {false, true} ->
-            tref = renew_timer(data.tref, :connect_timeout)
+            tref = Elm.Utils.renew_timer(data.tref, :connect_timeout)
 
             Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
             {to_send, rest} = List.pop_at(data.elm_queue, 0)
@@ -244,7 +213,7 @@ defmodule Elm.Connector do
             {:next_state, :connected_configured, data}
 
           {true, true} ->
-            tref = renew_timer(data.tref, :connect_timeout)
+            tref = Elm.Utils.renew_timer(data.tref, :connect_timeout)
 
             supported = Obd.DataTranslator.parse_supported_pids(msg)
             pretty_log_supported_pids(supported)
@@ -299,23 +268,10 @@ defmodule Elm.Connector do
 
   defp connect!(data) do
     GenStateMachine.cast(__MODULE__, :open_connection)
-    tref = renew_timer(data.tref, :connect_timeout)
+    tref = Elm.Utils.renew_timer(data.tref, :connect_timeout)
 
     {:next_state, :connect,
      %Data{uart_port_pid: data.uart_port_pid, elm_queue: elm_opts(), tref: tref}}
-  end
-
-  defp renew_timer(msg = :connect_timeout) do
-    Process.send_after(self(), msg, connect_timeout())
-  end
-
-  defp renew_timer(old_ref, msg = :connect_timeout) do
-    renew_timer(old_ref, msg, connect_timeout())
-  end
-
-  defp renew_timer(old_ref, msg, timeout) do
-    Process.cancel_timer(old_ref)
-    Process.send_after(self(), msg, timeout)
   end
 
   defp prepare_received(msg) do
@@ -399,10 +355,6 @@ defmodule Elm.Connector do
         # TODO handle :eagain
         :error
     end
-  end
-
-  defp connect_timeout() do
-    Application.fetch_env!(:pi_dash, :connect_timeout)
   end
 
   defp pretty_log_supported_pids(pids) do

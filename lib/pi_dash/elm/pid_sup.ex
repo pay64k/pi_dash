@@ -3,8 +3,6 @@ defmodule Elm.PidSup do
 
   require Logger
 
-  @relaxation_period 3000
-
   def start_link() do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -18,18 +16,6 @@ defmodule Elm.PidSup do
     ]
 
     Supervisor.init([], opts)
-  end
-
-  def nudge_workers(elm_pid) do
-    final_time =
-      __MODULE__
-      |> Supervisor.which_children()
-      |> Enum.reduce(@relaxation_period, fn {_, pid, _, _}, time_acc ->
-        Process.send_after(pid, :write, time_acc)
-        time_acc + 1000
-      end)
-
-    Process.send_after(elm_pid, :done_nudging, final_time)
   end
 
   def start_pid_worker(obd_pid_name, interval \\ 1000) do
