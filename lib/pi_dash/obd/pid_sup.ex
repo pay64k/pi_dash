@@ -3,6 +3,8 @@ defmodule Obd.PidSup do
 
   require Logger
 
+  @relaxation_period 3000
+
   def start_link() do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -16,6 +18,12 @@ defmodule Obd.PidSup do
     ]
 
     Supervisor.init([], opts)
+  end
+
+  def nudge_workers() do
+    __MODULE__
+    |> Supervisor.which_children()
+    |> Enum.each(fn {_, pid, _, _} -> Process.send_after(pid, :write, @relaxation_period) end)
   end
 
   def start_pid_worker(obd_pid_name, interval \\ 1000) do

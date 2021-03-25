@@ -78,7 +78,7 @@ defmodule Elm.Connector do
     #   "Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting connect timer..."
     # )
     Logger.warn("Got NO DATA, moving on.")
-
+    Obd.PidSup.nudge_workers()
     # tref = renew_timer(:connect_timeout)
     # Obd.PidSup.stop_all_workers()
     # {:next_state, :connected_configured, %Data{data | tref: tref}}
