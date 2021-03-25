@@ -54,8 +54,11 @@ In order to see extra stuff like how the message is decoded and what are the tra
 ```
 export EXTRA_LOGGING=true
 ```
+*Note:*
 
-If you cahnge any values in `env.sh`, you need to restart the application with:
+`EXTRA_LOGGING=true` will only take place if `LOG_LEVEL` is set to `debug`
+
+If you change any values in `env.sh`, you need to restart the application with:
 ```
 ./home/$USER/pi_dash/bin/pi_dash stop
 ./home/$USER/pi_dash/bin/pi_dash daemon
