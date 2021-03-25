@@ -9,7 +9,8 @@ defmodule Elm.Data do
     supported_pids: [],
     tref: nil,
     extra_logging: false,
-    nudging: false
+    nudging: false,
+    nudge_tref: nil
   ]
 end
 
@@ -24,6 +25,8 @@ defmodule Elm.Connector do
     "01" <> PT.name_to_pid(:pids_b),
     "01" <> PT.name_to_pid(:pids_c)
   ]
+
+  @nudge_period 10000
 
   def write_at_command(msg) do
     GenStateMachine.cast(__MODULE__, {:write, "AT " <> msg})
@@ -50,9 +53,15 @@ defmodule Elm.Connector do
     {:ok, uart_port_pid} = Circuits.UART.start_link()
     extra_logging = Application.fetch_env!(:pi_dash, :extra_logging)
     GenStateMachine.cast(__MODULE__, :open_connection)
+    nudge_tref = Process.send_after(self(), :nudge, @nudge_period)
 
     {:ok, :connect,
-     %Data{elm_queue: elm_opts(), uart_port_pid: uart_port_pid, extra_logging: extra_logging}}
+     %Data{
+       elm_queue: elm_opts(),
+       uart_port_pid: uart_port_pid,
+       nudge_tref: nudge_tref,
+       extra_logging: extra_logging
+     }}
   end
 
   def handle_event(
@@ -73,21 +82,32 @@ defmodule Elm.Connector do
         :info,
         {:circuits_uart, port, ">NO DATA"},
         :connected_configured,
-        data = %Data{port: port, nudging: false}
+        data = %Data{port: port, nudging: nudging}
       ) do
-    Logger.warn("Got NO DATA, moving on.")
-    Obd.PidSup.nudge_workers(self())
-    {:next_state, :connected_configured, %Data{data | nudging: true}}
-  end
-
-  def handle_event(:info,{:circuits_uart, port, ">NO DATA"},:connected_configured,%Data{port: port, nudging: true}) do
-    Logger.warn("Still nudging workers...")
-    :keep_state_and_data
+    if nudging do
+      Logger.debug("Still nudging workers...")
+      :keep_state_and_data
+    else
+      Logger.warn("Got NO DATA, nudge workers!")
+      Obd.PidSup.nudge_workers(self())
+      {:next_state, :connected_configured, %Data{data | nudging: true}}
+    end
   end
 
   def handle_event(:info, :done_nudging, state, data) do
     Logger.debug("Done nudging")
-    {:next_state, :connected_configured, %Data{data | nudging: false}}
+    {:next_state, state, %Data{data | nudging: false}}
+  end
+
+  def handle_event(:info, :nudge, state, data = %Data{nudging: nudging}) do
+    if nudging do
+      :keep_state_and_data
+    else
+      Logger.debug("Self initiated worker nudge.")
+      Obd.PidSup.nudge_workers(self())
+      nudge_tref = renew_timer(data.nudge_tref, :nudge, @nudge_period)
+      {:next_state, state, %Data{data | nudge_tref: nudge_tref, nudging: true}}
+    end
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
@@ -267,6 +287,7 @@ defmodule Elm.Connector do
 
       %{obd_pid_name: obd_pid_name} ->
         pid = Process.whereis(obd_pid_name)
+
         if pid != nil do
           send(pid, {:process, translated})
           :keep_state_and_data
