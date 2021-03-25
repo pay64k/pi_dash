@@ -260,8 +260,12 @@ defmodule Elm.Connector do
 
       %{obd_pid_name: obd_pid_name} ->
         pid = Process.whereis(obd_pid_name)
-        send(pid, {:process, translated})
-        :keep_state_and_data
+        if pid != nil do
+          send(pid, {:process, translated})
+          :keep_state_and_data
+        else
+          :keep_state_and_data
+        end
     end
   end
 
