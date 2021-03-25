@@ -20,7 +20,7 @@ defmodule PiDashWeb.RoomChannel do
 
   def handle_in("application:restart", _params, socket) do
     Logger.warn("GUI initiated application restart.")
-    Obd.PidSup.stop_all_workers()
+    Elm.PidSup.stop_all_workers()
     System.cmd("/home/#{System.get_env("USER")}/pi_dash/bin/pi_dash", ["restart"])
     {:noreply, socket}
   end
@@ -43,7 +43,7 @@ defmodule PiDashWeb.RoomChannel do
       ) do
     pid_name
     |> String.to_atom()
-    |> Obd.PidSup.start_pid_worker(interval)
+    |> Elm.PidSup.start_pid_worker(interval)
 
     {:noreply, socket}
   end
@@ -51,13 +51,13 @@ defmodule PiDashWeb.RoomChannel do
   def handle_in("status:stop_pid_worker", %{"pid_name" => pid_name}, socket) do
     pid_name
     |> String.to_atom()
-    |> Obd.PidSup.stop_pid_worker()
+    |> Elm.PidSup.stop_pid_worker()
 
     {:noreply, socket}
   end
 
   def handle_in("status:stop_all_workers", _params, socket) do
-    Obd.PidSup.stop_all_workers()
+    Elm.PidSup.stop_all_workers()
     {:noreply, socket}
   end
 

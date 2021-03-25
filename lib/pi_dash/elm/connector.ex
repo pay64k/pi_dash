@@ -89,7 +89,7 @@ defmodule Elm.Connector do
       :keep_state_and_data
     else
       Logger.warn("Got NO DATA, nudge workers!")
-      Obd.PidSup.nudge_workers(self())
+      Elm.PidSup.nudge_workers(self())
       {:next_state, :connected_configured, %Data{data | nudging: true}}
     end
   end
@@ -104,7 +104,7 @@ defmodule Elm.Connector do
       :keep_state_and_data
     else
       Logger.debug("Self initiated worker nudge.")
-      Obd.PidSup.nudge_workers(self())
+      Elm.PidSup.nudge_workers(self())
       nudge_tref = renew_timer(data.nudge_tref, :nudge, @nudge_period)
       {:next_state, state, %Data{data | nudge_tref: nudge_tref, nudging: true}}
     end

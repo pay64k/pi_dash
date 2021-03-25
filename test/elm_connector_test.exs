@@ -14,8 +14,8 @@ defmodule ElmConnectorTest do
 
     {:ok, _pid} =
       start_supervised(%{
-        id: Obd.PidSup,
-        start: {Obd.PidSup, :start_link, []}
+        id: Elm.PidSup,
+        start: {Elm.PidSup, :start_link, []}
       })
 
     {:ok, _pid} =
@@ -63,7 +63,7 @@ defmodule ElmConnectorTest do
   test "start and recieve some data - sunny day", context do
     assert full_configuration(context)
 
-    Obd.PidSup.start_pid_worker(:rpm)
+    Elm.PidSup.start_pid_worker(:rpm)
     assert_state(:connected_configured)
 
     refute_wrote("AT Z")
@@ -80,7 +80,7 @@ defmodule ElmConnectorTest do
   test "start and receive data then get NO DATA and resume connection", context do
     assert full_configuration(context)
 
-    Obd.PidSup.start_pid_worker(:rpm)
+    Elm.PidSup.start_pid_worker(:rpm)
     assert_state(:connected_configured)
 
     refute_wrote("AT Z")

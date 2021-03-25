@@ -1,4 +1,4 @@
-defmodule Obd.PidSup do
+defmodule Elm.PidSup do
   use Supervisor
 
   require Logger
@@ -52,7 +52,7 @@ defmodule Obd.PidSup do
   defp child_spec(obd_pid_name, interval, extra_logging) do
     %{
       id: obd_pid_name,
-      start: {Obd.PidWorker, :start_link, [obd_pid_name, extra_logging, interval]}
+      start: {Elm.PidWorker, :start_link, [obd_pid_name, extra_logging, interval]}
     }
   end
 end
