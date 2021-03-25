@@ -83,28 +83,26 @@ defmodule Elm.Connector do
     {:next_state, :connected_configured, %Data{data | tref: tref}}
   end
 
-  def handle_event(
-        :info,
-        {:circuits_uart, port, msg},
-        state,
-        data = %Data{port: port, extra_logging: extra_logging}
-      ) do
-    if extra_logging, do: Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
+  def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do
+    Logger.debug("Got from ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
     msg
     |> prepare_received()
     |> handle_msg(state, data)
   end
 
-  def handle_event(:cast, {:write, msg}, state, data = %Data{extra_logging: extra_logging}) do
-    if extra_logging, do: Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
+  def handle_event(:cast, {:write, msg}, state, data) do
+    Logger.debug("Write to ELM: #{inspect(msg)}, state: #{inspect(state)}")
 
     :ok = Circuits.UART.write(data.uart_port_pid, msg)
     :keep_state_and_data
   end
 
   def handle_event(:info, :connect_timeout, state, data) do
-    Logger.warn("Didn't get a response from ELM (state: #{state}). Restarting...")
+    Logger.warn(
+      "Didn't get a response from ELM (state: #{state}, last sent: #{data.last_sent_command}). Restarting..."
+    )
+
     connect!(data)
   end
 
@@ -143,6 +141,10 @@ defmodule Elm.Connector do
         GenStateMachine.cast(__MODULE__, :open_connection)
         {:next_state, :connect, %Data{data | tref: nil}}
     end
+  end
+
+  def handle_event(:cast, :open_connection, _state, _data) do
+    :keep_state_and_data
   end
 
   defp handle_msg(msg, :configuring, data) do
