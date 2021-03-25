@@ -15,7 +15,7 @@ defmodule Elm.PidWorker do
     obd_pid_hex_string = Obd.PidTranslator.name_to_pid(obd_pid_name)
 
     nudge_interval = Application.fetch_env!(:pi_dash, :nudge_interval)
-    nudge_tref = Process.send_after(self(), :write_nudge, nudge_interval)
+    nudge_tref = Process.send_after(self(), :nudge_write, nudge_interval)
 
     write_tref = Process.send_after(self(), :write, write_interval)
 
@@ -35,12 +35,12 @@ defmodule Elm.PidWorker do
 
   def handle_info(:write, state = %{obd_pid_hex_string: obd_pid_hex_string}) do
     Elm.Connector.write_command(@obd_mode <> obd_pid_hex_string)
-    nudge_tref = Elm.Utils.renew_timer(state.nudge_tref, :write_nudge, state.nudge_interval)
+    nudge_tref = Elm.Utils.renew_timer(state.nudge_tref, :nudge_write, state.nudge_interval)
     {:noreply, %{state | nudge_tref: nudge_tref}}
   end
 
   def handle_info(
-        :write_nudge,
+        :nudge_write,
         state = %{
           obd_pid_hex_string: obd_pid_hex_string,
           obd_pid_name: obd_pid_name,
@@ -51,7 +51,7 @@ defmodule Elm.PidWorker do
       ) do
     Logger.warn("Nudge write in #{obd_pid_name}, happened: #{n + 1} times.")
     Elm.Connector.write_command(@obd_mode <> obd_pid_hex_string)
-    nudge_tref = Elm.Utils.renew_timer(nudge_tref, :write_nudge, nudge_interval)
+    nudge_tref = Elm.Utils.renew_timer(nudge_tref, :nudge_write, nudge_interval)
     {:noreply, %{state | nudge_writes: n + 1, nudge_tref: nudge_tref}}
   end
 
@@ -67,7 +67,7 @@ defmodule Elm.PidWorker do
     if extra_logging,
       do:
         Logger.debug(
-          "Pid worker #{inspect(obd_pid_name)} recieved data: #{
+          "Pid worker #{inspect(obd_pid_name)} received data: #{
             inspect(msg.data, binaries: :as_binaries)
           }"
         )
