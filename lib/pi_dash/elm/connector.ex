@@ -8,7 +8,8 @@ defmodule Elm.Data do
     :protocol_number,
     supported_pids: [],
     tref: nil,
-    extra_logging: false
+    extra_logging: false,
+    nudging: false
   ]
 end
 
@@ -72,17 +73,21 @@ defmodule Elm.Connector do
         :info,
         {:circuits_uart, port, ">NO DATA"},
         :connected_configured,
-        _data = %Data{port: port}
+        data = %Data{port: port, nudging: false}
       ) do
-    # Logger.error(
-    #   "Lost conenction to car's ECU! (Got 'NO DATA' from ELM in :connected_configured state) Starting connect timer..."
-    # )
     Logger.warn("Got NO DATA, moving on.")
-    Obd.PidSup.nudge_workers()
-    # tref = renew_timer(:connect_timeout)
-    # Obd.PidSup.stop_all_workers()
-    # {:next_state, :connected_configured, %Data{data | tref: tref}}
+    Obd.PidSup.nudge_workers(self())
+    {:next_state, :connected_configured, %Data{data | nudging: true}}
+  end
+
+  def handle_event(:info,{:circuits_uart, port, ">NO DATA"},:connected_configured,%Data{port: port, nudging: true}) do
+    Logger.warn("Still nudging workers...")
     :keep_state_and_data
+  end
+
+  def handle_event(:info, :done_nudging, state, data) do
+    Logger.debug("Done nudging")
+    {:next_state, :connected_configured, %Data{data | nudging: false}}
   end
 
   def handle_event(:info, {:circuits_uart, port, msg}, state, data = %Data{port: port}) do

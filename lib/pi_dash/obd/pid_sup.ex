@@ -20,10 +20,16 @@ defmodule Obd.PidSup do
     Supervisor.init([], opts)
   end
 
-  def nudge_workers() do
-    __MODULE__
-    |> Supervisor.which_children()
-    |> Enum.each(fn {_, pid, _, _} -> Process.send_after(pid, :write, @relaxation_period) end)
+  def nudge_workers(elm_pid) do
+    final_time =
+      __MODULE__
+      |> Supervisor.which_children()
+      |> Enum.reduce(@relaxation_period, fn {_, pid, _, _}, time_acc ->
+        Process.send_after(pid, :write, time_acc)
+        time_acc + 1000
+      end)
+
+    Process.send_after(elm_pid, :done_nudging, final_time)
   end
 
   def start_pid_worker(obd_pid_name, interval \\ 1000) do
