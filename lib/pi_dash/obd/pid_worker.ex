@@ -12,7 +12,8 @@ defmodule Obd.PidWorker do
 
   def init(opts = [obd_pid_name, interval, extra_logging]) do
     Logger.info("Starting #{inspect(__MODULE__)} with opts: #{inspect(opts)}")
-    {:ok, tref} = :timer.send_interval(interval, self(), :write)
+
+    tref = Process.send_after(self(), :write, interval)
     obd_pid_hex_string = Obd.PidTranslator.name_to_pid(obd_pid_name)
 
     {:ok,
@@ -33,7 +34,7 @@ defmodule Obd.PidWorker do
 
   def handle_info(
         {:process, msg},
-        state = %{last_value: last_value, extra_logging: extra_logging}
+        state = %{last_value: last_value, interval: interval, extra_logging: extra_logging}
       ) do
     if extra_logging,
       do:
@@ -52,7 +53,9 @@ defmodule Obd.PidWorker do
 
         to_web = format_msg_to_web(last_value, state)
         PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
-        {:noreply, state}
+        Process.cancel_timer(state.tref)
+        tref = Process.send_after(self(), :write, interval)
+        {:noreply, %{state | tref: tref}}
 
       value ->
         if extra_logging,
@@ -63,7 +66,9 @@ defmodule Obd.PidWorker do
 
         to_web = format_msg_to_web(value, state)
         PiDashWeb.RoomChannel.send_to_channel(:update, to_web)
-        {:noreply, %{state | last_value: value}}
+        Process.cancel_timer(state.tref)
+        tref = Process.send_after(self(), :write, interval)
+        {:noreply, %{state | last_value: value, tref: tref}}
     end
   end
 
