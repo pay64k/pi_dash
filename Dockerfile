@@ -1,5 +1,5 @@
 # https://kaiwern.com/posts/2020/06/20/building-elixir/phoenix-release-with-docker/
-# TODO: add version script from the aboe page
+# TODO: add version script from the above page
 ARG base_image
 
 FROM $base_image as build

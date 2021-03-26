@@ -20,6 +20,23 @@ defmodule Elm.Utils do
     end
   end
 
+  def renew_timer(msg = :connect_timeout) do
+    Process.send_after(self(), msg, connect_timeout())
+  end
+
+  def renew_timer(old_ref, msg = :connect_timeout) do
+    renew_timer(old_ref, msg, connect_timeout())
+  end
+
+  def renew_timer(old_ref, msg, timeout) do
+    Process.cancel_timer(old_ref)
+    Process.send_after(self(), msg, timeout)
+  end
+
+  defp connect_timeout() do
+    Application.fetch_env!(:pi_dash, :connect_timeout)
+  end
+
   defp find_serial_port() do
     devices = Circuits.UART.enumerate()
     Logger.debug("Enumerated ports: #{inspect(devices)}")

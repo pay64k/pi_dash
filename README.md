@@ -1,4 +1,3 @@
-[![build_on_rpi4](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/build_on_rpi4.yml)
 [![CI](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml/badge.svg)](https://github.com/pay64k/pi_dash/actions/workflows/tests.yml)
 
 # pi_dash - automotive (rally) dash written in Elixir and React that runs on Raspberry Pi
@@ -31,16 +30,41 @@ or
 for detached mode.
 
 ## Configuration
-### Run on specific serial port
-If pi_dash doesn't find a supported ELM device to connect to it will try on specific serial port. If your ELM device is not supported (e.g. does not auto-detect) you can edit
+Custom configuration parameters are located in
 ```
 /home/$USER/pi_dash/releases/x.x.x/env.sh
 ```
-
-and change `SERIAL_PORT` environment variable to you port, for example:
+### Run on specific serial port
+If pi_dash doesn't find a supported ELM device to connect to it will try on specific serial port. If your ELM device is not supported (e.g. does not auto-detect) you can edit the `env.sh` file and change `SERIAL_PORT` environment variable to you port, for example:
 ```
 export SERIAL_PORT="/dev/pts/2"
 ```
+### Max RPM (default 6500)
+Since all cars are different it is possible to set your own value for maximum RPM your engine can have.
+In `env.sh` change the value to match your car:
+```
+export MAX_RPM=6500
+```
+### Debug logs
+For problems reporting and debugging in "production" you can change `LOG_LEVEL` variable to debug:
+```
+export LOG_LEVEL=debug
+```
+In order to see extra stuff like how the message is decoded and what are the translated values, change this to true:
+```
+export EXTRA_LOGGING=true
+```
+*Note:*
+
+`EXTRA_LOGGING=true` will only take place if `LOG_LEVEL` is set to `debug`
+
+If you change any values in `env.sh`, you need to restart the application with:
+```
+./home/$USER/pi_dash/bin/pi_dash stop
+./home/$USER/pi_dash/bin/pi_dash daemon
+```
+or reboot your Raspberry Pi.
+
 ### Raspberry Pi configuration
 [OS installation](https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup)
 
@@ -67,7 +91,8 @@ Before running the workflow, do the following:
 
 TODO:
 * [ ] Hibernate RPi when the car engine is off (or by external button flip)
-* [ ] Longer tests with car to test stability of the application, deadlocks etc
-* [ ] Add support for ELM devices from different manufacturers
+* [ ] Handle reconnect when engine is off
+* [x] Longer tests with car to test stability of the application, deadlocks etc
+* [x] Add support for ELM devices from different manufacturers
 * [ ] Enhance GUI: support for different gauge types. Make it more flashy? Add theme support?
 * [ ] Create `img` file with all above configuration ready to burn on SD card for RPi, [guide](https://medium.com/platformer-blog/creating-a-custom-raspbian-os-image-for-production-3fcb43ff3630) or can Nerves do the same?

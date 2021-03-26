@@ -2,44 +2,111 @@ defmodule ElmConnectorTest do
   use ExUnit.Case
 
   setup do
+    ExMeck.new(PiDashWeb.RoomChannel, [:passthrough])
+    ExMeck.expect(PiDashWeb.RoomChannel, :send_to_channel, fn _, _ -> :ok end)
+
     ExMeck.new(Circuits.UART, [:passthrough])
     ExMeck.expect(Circuits.UART, :open, fn _, _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :write, fn _, _ -> :ok end)
     ExMeck.expect(Circuits.UART, :enumerate, fn -> %{"port" => %{manufacturer: "Prolific"}} end)
 
-    pid = start_connector()
+    elm_pid = start_connector()
+
+    {:ok, _pid} =
+      start_supervised(%{
+        id: Elm.PidSup,
+        start: {Elm.PidSup, :start_link, []}
+      })
+
+    {:ok, _pid} =
+      start_supervised(%{
+        id: Car,
+        start: {Car, :start_link, [elm_pid]}
+      })
+
+    # Car.start_link(elm_pid)
 
     on_exit(fn ->
       ExMeck.unload()
     end)
 
-    {:ok, connector_pid: pid, serial_port: "port"}
+    {:ok, elm_pid: elm_pid, serial_port: "port"}
   end
 
   test "sunny day - full configuration ok", context do
     assert full_configuration(context)
   end
 
-  # TODO
-  test "start and recieve some data", context do
-    assert true == full_configuration(context)
-    Process.sleep(1000)
-    send_to_connector("486B10410C0F3251", context)
+  test "restart on no response from ELM in connect state", _context do
+    assert_state(:configuring)
+    assert_wrote("AT Z")
+    timeout()
+    assert_wrote("AT Z")
+    assert_state(:configuring)
+  end
+
+  test "connect and dont restart after no response (no pids configured)", context do
+    assert full_configuration(context)
+    timeout()
+    refute_wrote("AT Z")
+    assert_state(:connected_configured)
   end
 
   # TODO
-  test "supported pids", context do
-    assert true == full_configuration(context)
-    Elm.Connector.get_supported_pids() |> IO.inspect()
+  test "connect and get NO DATA, then restart", context do
+    assert full_configuration(context)
+    timeout()
+    send_to_connector(">NO DATA", context)
+    # assert_wrote("AT Z")
+    Process.sleep(100)
+  end
+
+  test "start and recieve some data - sunny day", context do
+    assert full_configuration(context)
+
+    Elm.PidSup.start_pid_worker(:rpm)
+    assert_state(:connected_configured)
+
+    refute_wrote("AT Z")
+    Car.start_sending(:rpm, 100)
+    refute_wrote("AT Z")
+    Process.sleep(200)
+
+    assert ExMeck.contains?(
+             PiDashWeb.RoomChannel,
+             {:_, {PiDashWeb.RoomChannel, :send_to_channel, [:update, :_]}, :_}
+           )
+  end
+
+  # TODO
+  test "start and receive data then get NO DATA and resume connection", context do
+    assert full_configuration(context)
+
+    Elm.PidSup.start_pid_worker(:rpm)
+    assert_state(:connected_configured)
+
+    refute_wrote("AT Z")
+
+    Car.start_sending(:rpm, 300)
+    Process.sleep(2000)
+    Car.stop_sending(:rpm)
+
+    send_to_connector(">NO DATA", context)
+    # assert full_configuration(context)
   end
 
   # Private
 
+  defp timeout() do
+    delay = Application.fetch_env!(:pi_dash, :connect_timeout) + 100
+    Process.sleep(delay)
+  end
+
   defp full_configuration(context) do
     assert_wrote("AT Z")
-    assert get_state() == :configuring
+    assert_state(:configuring)
     send_to_connector("ELM v1.5", context)
-    assert get_state() == :configuring
+    assert_state(:configuring)
     send_to_connector("OK", context)
     assert_wrote("AT E0")
     send_to_connector("OK", context)
@@ -55,19 +122,19 @@ defmodule ElmConnectorTest do
     send_to_connector("OK", context)
     assert_wrote("AT DPN")
     send_to_connector("A0", context)
-    assert get_state() == :get_supported_pids
+    assert_state(:get_supported_pids)
     assert_wrote("0100")
     send_to_connector("486B104100BE1FA813C9", context)
     assert_wrote("0120")
     send_to_connector("486B104120BE1FAFF3C9", context)
     assert_wrote("0140")
     send_to_connector("486B104140BE1FAA13C9", context)
-    assert get_state() == :connected_configured
+    assert_state(:connected_configured)
     true
   end
 
   defp send_to_connector(msg, context) do
-    pid = context[:connector_pid]
+    pid = context[:elm_pid]
     port = context[:serial_port]
     send(pid, {:circuits_uart, port, msg})
   end
@@ -83,8 +150,17 @@ defmodule ElmConnectorTest do
   end
 
   defp assert_wrote(msg) do
-    assert true == ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
+    assert ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
     ExMeck.reset(Circuits.UART)
+  end
+
+  defp refute_wrote(msg) do
+    refute ExMeck.contains?(Circuits.UART, {:_, {Circuits.UART, :write, [:_, msg]}, :_})
+    ExMeck.reset(Circuits.UART)
+  end
+
+  defp assert_state(state) do
+    assert state == get_state()
   end
 
   defp get_state() do

@@ -1,4 +1,4 @@
-defmodule Obd.PidSup do
+defmodule Elm.PidSup do
   use Supervisor
 
   require Logger
@@ -19,7 +19,8 @@ defmodule Obd.PidSup do
   end
 
   def start_pid_worker(obd_pid_name, interval \\ 1000) do
-    Supervisor.start_child(__MODULE__, child_spec(obd_pid_name, interval))
+    extra_logging = Application.fetch_env!(:pi_dash, :extra_logging)
+    Supervisor.start_child(__MODULE__, child_spec(obd_pid_name, interval, extra_logging))
   end
 
   def stop_pid_worker(obd_pid_name) do
@@ -34,10 +35,10 @@ defmodule Obd.PidSup do
     |> Enum.each(fn {id, _, _, _} -> stop_pid_worker(id) end)
   end
 
-  defp child_spec(obd_pid_name, interval) do
+  defp child_spec(obd_pid_name, interval, extra_logging) do
     %{
       id: obd_pid_name,
-      start: {Obd.PidWorker, :start_link, [obd_pid_name, interval]}
+      start: {Elm.PidWorker, :start_link, [obd_pid_name, extra_logging, interval]}
     }
   end
 end

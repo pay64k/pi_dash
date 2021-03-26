@@ -1,10 +1,15 @@
 defmodule Obd.DataTranslator do
   require Logger
 
+  def decode_data("") do
+    :error
+  end
+
   def decode_data(hex_string) do
     <<header::24, mode::8, pid::8, data_and_crc::binary>> = Base.decode16!(hex_string)
-    Logger.debug("decoded data for #{hex_string}:
-       header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{inspect(Base.encode16(<<mode::8>>))}, pid: #{inspect(Base.encode16(<<pid::8>>))}")
+    if Application.fetch_env!(:pi_dash, :extra_logging), do:
+      Logger.debug("decoded data for #{hex_string}:
+        header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{inspect(Base.encode16(<<mode::8>>))}, pid: #{inspect(Base.encode16(<<pid::8>>))}")
 
     obd_pid_name =
       <<pid::8>>
