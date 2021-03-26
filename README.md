@@ -91,6 +91,7 @@ Before running the workflow, do the following:
 
 TODO:
 * [ ] Hibernate RPi when the car engine is off (or by external button flip)
+* [ ] Handle reconnect when engine is off
 * [x] Longer tests with car to test stability of the application, deadlocks etc
 * [x] Add support for ELM devices from different manufacturers
 * [ ] Enhance GUI: support for different gauge types. Make it more flashy? Add theme support?
