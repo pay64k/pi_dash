@@ -113,7 +113,7 @@ class Controller extends React.Component {
     return (
       <div>
         <Dash channel={this.channel} active_pids={this.state.active_pids} />
-        <footer className="controller bg-light text-center text-lg-start">
+        <footer className="controller text-center text-lg-start">
           <div className="container p-0">
             <div className="row row-30">
               <div className="col-sm">
@@ -121,7 +121,7 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
-                  <NightMode/>
+                  <NightMode setTheme_cb={this.props.setTheme_cb}/>
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown
