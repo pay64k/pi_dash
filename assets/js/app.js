@@ -29,10 +29,6 @@ class App extends React.Component {
     this.channel = socket.channel("room:dash", {});
   }
 
-  maybe_start_pid_worker_cb = (pid) => {
-    this.maybe_start_pid_worker(pid)
-  }
-
   setTheme_cb = (new_theme) => {
     let theme
     switch (new_theme) {
@@ -60,6 +56,7 @@ class App extends React.Component {
         <>
           <GlobalStyles />
           <Controller channel={this.channel} setTheme_cb={this.setTheme_cb} />
+          <div className="MuiLinearProgress-barColorPrimary MuiLinearProgress-colorPrimary"></div>
         </>
       </ThemeProvider>
     )
