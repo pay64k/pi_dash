@@ -38,11 +38,8 @@ function toggle(event, setChecked_fn, theme, setTheme, setTheme_cb) {
 
 function choose_icon(checked) {
     if (checked) {
-        // document.getElementById("top_html").style.filter = "invert(0%)";
-
         return <BrightnessHigh />
     } else {
-        // document.getElementById("top_html").style.filter = "invert(100%)";
         return <BrightnessHighFill />
     }
 }

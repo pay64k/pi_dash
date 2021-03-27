@@ -121,7 +121,7 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
-                  <NightMode setTheme_cb={this.props.setTheme_cb}/>
+                  <NightMode setTheme_cb={this.props.setTheme_cb} />
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown

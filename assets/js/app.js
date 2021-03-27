@@ -11,7 +11,6 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './themes/theme';
 import { GlobalStyles } from './themes/global';
 
-
 import Controller from "./components/controller";
 
 class App extends React.Component {
