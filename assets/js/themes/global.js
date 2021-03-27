@@ -14,7 +14,6 @@ export const GlobalStyles = createGlobalStyle`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100vh;
     margin: 0;
     padding: 0;
     font-family: monospace;
