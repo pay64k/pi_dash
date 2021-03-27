@@ -5,7 +5,7 @@ class GaugeSelection extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            active: "linear"
+            active: props.gauges[0]
         }
     }
 

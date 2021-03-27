@@ -17,7 +17,7 @@ const BorderLinearProgress = withStyles((theme) => ({
     },
 }))(LinearProgress);
 
-class LinearGauge2 extends React.Component {
+class BarGauge extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -87,4 +87,4 @@ class LinearGauge2 extends React.Component {
     }
 }
 
-export default LinearGauge2
+export default BarGauge

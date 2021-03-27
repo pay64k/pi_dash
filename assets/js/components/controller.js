@@ -1,14 +1,14 @@
 import React from 'react'
 import { Button, ButtonGroup } from 'react-bootstrap';
-import Clock from './clock'
-import Interval from './interval'
-import Dash from "./dash";
-import PidsDropdown from "./pids_dropdown"
-import GaugeSelection from "./gauge_selection"
-import NightMode from "./night_mode"
+import Clock from './controller/clock'
+import Interval from './controller/interval'
+import Dash from "./gauges/dash";
+import PidsDropdown from "./controller/pids_dropdown"
+import GaugeSelection from "./controller/gauge_selection"
+import NightMode from "./controller/night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
-const gauges = ["bar_1", "bar_2"]
+const gauges = ["bar"]
 
 class Controller extends React.Component {
   constructor(props) {

@@ -6,7 +6,6 @@ class PidsDropdown extends React.Component {
         super(props);
     }
 
-
     render() {
         return (
                 <DropdownButton

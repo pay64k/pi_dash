@@ -1,7 +1,6 @@
 import React from "react";
 
-import LinearGauge from './linear_gauge'
-import LinearGauge2 from './linear_gauge2'
+import BarGauge from './bar_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -32,10 +31,8 @@ class Dash extends React.Component {
   gaugeTypeToComponent(props) {
     let p = {...props, channel: this.channel}
     switch (props.active_gauge) {
-      case "linear":
-        return <LinearGauge {...p}/>;
-      case "linear2":
-        return <LinearGauge2 {...p}/>;
+      case "bar":
+        return <BarGauge {...p}/>;
     }
   }
 
