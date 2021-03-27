@@ -5,9 +5,10 @@ import Interval from './interval'
 import Dash from "./dash";
 import PidsDropdown from "./pids_dropdown"
 import GaugeSelection from "./gauge_selection"
+import NightMode from "./night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
-const gauges = ["linear", "linear2"]
+const gauges = ["bar_1", "bar_2"]
 
 class Controller extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class Controller extends React.Component {
       supported_pids: [],
       active_pids: JSON.parse(JSON.stringify(active_pids)),
       active_interval: 1000,
-      active_gauge: "linear"
+      active_gauge: gauges[0]
     };
   }
 
@@ -120,6 +121,7 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
+                  <NightMode/>
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown
