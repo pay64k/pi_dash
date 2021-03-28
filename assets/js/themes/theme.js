@@ -12,6 +12,6 @@ export const darkTheme = {
   text: '#FAFAFA',
   toggleBorder: '#6B8096',
   gradient: 'linear-gradient(#091236, #1E215D)',
-  barColor: '#2a2b2b',
+  barColor: '#252525',
   barBgColor: '#5e5d5f'
 }
