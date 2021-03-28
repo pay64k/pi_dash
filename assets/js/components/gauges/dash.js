@@ -48,7 +48,7 @@ class Dash extends React.Component {
         }
       >
           {/* this hack is here so theme provider applies styles to next gauges created */}
-          <div key="dummy" style={{display: "none"}} data-grid={{ w: 1, h: 1, x: 0, y: 0 }}>
+          <div key="dummy" style={{display: "none"}} data-grid={{ w: 0, h: 0, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent({active_gauge: "bar"})}
           </div>
         {this.state.active_pids.map((pid) => (
