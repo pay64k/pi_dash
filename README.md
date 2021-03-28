@@ -13,6 +13,22 @@ In the beginning I only wanted to make a simple tachometer, but then decided to 
 ### **Note:**
 The project is still in development and was tested only on several cars. GUI would use some enhancements - but for now it's the simplest working solution.
 #
+
+## Features
+* Automatically finds and configures ELM device
+* Currently supported OBD PIDs:
+    * RPM
+    * Vehicle speed
+    * Intake temp
+    * Throttle position
+    * Timing advance
+    * Engine load
+    * Coolant temp
+* Selectable intervals for data collection
+* Light and night mode GUI
+* Draggable and resizable gauges
+* Selections of gauges and layout are not lost upon restart
+* User configurable max RPM range
 ## High level overview
 ![alt text](.github/readme/block.png)
 
@@ -94,5 +110,5 @@ TODO:
 * [ ] Handle reconnect when engine is off
 * [x] Longer tests with car to test stability of the application, deadlocks etc
 * [x] Add support for ELM devices from different manufacturers
-* [ ] Enhance GUI: support for different gauge types. Make it more flashy? Add theme support?
+* [x] Enhance GUI: support for different gauge types. Make it more flashy? Add theme support?
 * [ ] Create `img` file with all above configuration ready to burn on SD card for RPi, [guide](https://medium.com/platformer-blog/creating-a-custom-raspbian-os-image-for-production-3fcb43ff3630) or can Nerves do the same?
