@@ -29,10 +29,10 @@ h4, h5, h6 {
   width: 40px !important;
   height: 30px !important;
 }
-.react-grid-layout {
-  background: #eee;
-  margin-top: 10px;
-}
+// .react-grid-layout {
+//   background: #eee;
+//   margin-top: 10px;
+// }
 .layoutJSON {
   background: #ddd;
   border: 1px solid black;
@@ -48,14 +48,14 @@ h4, h5, h6 {
   box-sizing: border-box;
 }
 .react-grid-item:not(.react-grid-placeholder) {
-  background: #ccc;
+  // background: #ccc;
   border: 1px solid black;
 }
 .react-grid-item.resizing {
   opacity: 0.9;
 }
 .react-grid-item.static {
-  background: #cce;
+  // background: #cce;
 }
 .react-grid-item .text {
   font-size: 24px;

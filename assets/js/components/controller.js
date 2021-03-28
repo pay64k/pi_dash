@@ -1,13 +1,14 @@
 import React from 'react'
 import { Button, ButtonGroup } from 'react-bootstrap';
-import Clock from './clock'
-import Interval from './interval'
-import Dash from "./dash";
-import PidsDropdown from "./pids_dropdown"
-import GaugeSelection from "./gauge_selection"
+import Clock from './controller/clock'
+import Interval from './controller/interval'
+import Dash from "./gauges/dash";
+import PidsDropdown from "./controller/pids_dropdown"
+import GaugeSelection from "./controller/gauge_selection"
+import NightMode from "./controller/night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
-const gauges = ["linear", "linear2"]
+const gauges = ["bar"]
 
 class Controller extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class Controller extends React.Component {
       supported_pids: [],
       active_pids: JSON.parse(JSON.stringify(active_pids)),
       active_interval: 1000,
-      active_gauge: "linear"
+      active_gauge: gauges[0]
     };
   }
 
@@ -112,7 +113,7 @@ class Controller extends React.Component {
     return (
       <div>
         <Dash channel={this.channel} active_pids={this.state.active_pids} />
-        <footer className="controller bg-light text-center text-lg-start">
+        <footer className="controller text-center text-lg-start">
           <div className="container p-0">
             <div className="row row-30">
               <div className="col-sm">
@@ -120,6 +121,7 @@ class Controller extends React.Component {
               </div>
               <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
+                  <NightMode setTheme_cb={this.props.setTheme_cb} />
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
                   <Interval update_active_interval_cb={this.update_active_interval_cb} />
                   <PidsDropdown

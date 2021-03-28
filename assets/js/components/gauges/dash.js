@@ -1,7 +1,6 @@
 import React from "react";
 
-import LinearGauge from './linear_gauge'
-import LinearGauge2 from './linear_gauge2'
+import BarGauge from './bar_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -32,10 +31,8 @@ class Dash extends React.Component {
   gaugeTypeToComponent(props) {
     let p = {...props, channel: this.channel}
     switch (props.active_gauge) {
-      case "linear":
-        return <LinearGauge {...p}/>;
-      case "linear2":
-        return <LinearGauge2 {...p}/>;
+      case "bar":
+        return <BarGauge {...p}/>;
     }
   }
 
@@ -50,6 +47,10 @@ class Dash extends React.Component {
           this.onLayoutChange(layout, layouts)
         }
       >
+          {/* this hack is here so theme provider applies styles to next gauges created */}
+          <div key="dummy" style={{display: "none"}} data-grid={{ w: 0, h: 0, x: 0, y: 0 }}>
+            {this.gaugeTypeToComponent({active_gauge: "bar"})}
+          </div>
         {this.state.active_pids.map((pid) => (
           <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent(pid)}

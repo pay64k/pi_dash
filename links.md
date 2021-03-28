@@ -50,3 +50,6 @@ install hex
 mix local.rebar --force
 
 add react to phoenix https://dewetblomerus.com/2018/11/30/react-on-phoenix-1-4.html
+
+dark theme tutorial
+https://css-tricks.com/a-dark-mode-toggle-with-react-and-themeprovider/
