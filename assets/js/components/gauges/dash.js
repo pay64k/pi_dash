@@ -1,6 +1,7 @@
 import React from "react";
 
 import BarGauge from './bar_gauge'
+import ArcGauge from './arc_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -33,6 +34,8 @@ class Dash extends React.Component {
     switch (props.active_gauge) {
       case "bar":
         return <BarGauge {...p}/>;
+      case "arc":
+        return <ArcGauge {...p}/>;
     }
   }
 
