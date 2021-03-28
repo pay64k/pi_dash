@@ -1,7 +1,6 @@
 import React from "react";
 
 import BarGauge from './bar_gauge'
-import ArcGauge from './arc_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
