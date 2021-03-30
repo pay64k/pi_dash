@@ -1,0 +1,22 @@
+[debug] Got from ELM: "7E8064100BE3EB813", state: :get_supported_pids
+[debug] :get_supported_pids {next}: {true, true}
+[info] Supported PIDs hex: ["01", "03", "04", "05", "06", "07", "0B", "0C", "0D", "0E", "0F", "11", "13", "14", "15", "1C", "1F", "20"]
+[info] Supported PIDs names: [:status, :fuel_status, :engine_load, :coolant_temp, :short_fuel_trim_1,
+ :long_fuel_trim_1, :intake_pressure, :rpm, :speed, :timing_advance,
+ :intake_temp, :throttle_pos, :o2_sensors, :o2_b1s1, :o2_b1s2, :obd_compliance,
+ :run_time, :pids_b]
+[debug] Write to ELM: "0120", state: :get_supported_pids
+[debug] Got from ELM: ">7E8064120801FA011", state: :get_supported_pids
+[debug] :get_supported_pids {next}: {true, true}
+[info] Supported PIDs hex: ["21", "2C", "2D", "2E", "2F", "30", "31", "33", "3C", "40"]
+[info] Supported PIDs names: [:distance_w_mil, :commanded_egr, :egr_error, :evaporative_purge, :fuel_level,
+ :warmups_since_dtc_clear, :distance_since_dtc_clear, :barometric_pressure,
+ :catalyst_temp_b1s1, :pids_c]
+[debug] Write to ELM: "0140", state: :get_supported_pids
+[debug] Got from ELM: ">7E8064140FED08000", state: :get_supported_pids
+[debug] :get_supported_pids {next}: {true, false}
+[info] Supported PIDs hex: ["41", "42", "43", "44", "45", "46", "47", "49", "4A", "4C", "51"]
+[info] Supported PIDs names: [:status_drive_cycle, :control_module_voltage, :absolute_load,
+ :commanded_equiv_ratio, :relative_throttle_pos, :ambiant_air_temp,
+ :throttle_pos_b, :accelerator_pos_d, :accelerator_pos_e, :throttle_actuator,
+ :fuel_type]
