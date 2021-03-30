@@ -1,6 +1,7 @@
 import React from "react";
 
 import BarGauge from './bar_gauge'
+import ReactRadialGauge from './arc_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -34,7 +35,7 @@ class Dash extends React.Component {
       case "bar":
         return <BarGauge {...p}/>;
       case "arc":
-        return <ArcGauge {...p}/>;
+        return <ReactRadialGauge {...p}/>;
     }
   }
 
@@ -42,7 +43,7 @@ class Dash extends React.Component {
     return (
       <ResponsiveReactGridLayout
         className="layout"
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={30}
         layouts={this.state.layouts}
         onLayoutChange={(layout, layouts) =>
@@ -53,6 +54,9 @@ class Dash extends React.Component {
           <div key="dummy" style={{display: "none"}} data-grid={{ w: 0, h: 0, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent({active_gauge: "bar"})}
           </div>
+          {/* <div key="dummy2" id="bla" data-grid={{ w: 1, h: 1, x: 0, y: 0 }}>
+          <ReactRadialGauge value={0} width={165} height={150}/>
+          </div> */}
         {this.state.active_pids.map((pid) => (
           <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent(pid)}
