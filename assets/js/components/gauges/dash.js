@@ -1,7 +1,7 @@
 import React from "react";
 
 import BarGauge from './bar_gauge'
-import ReactRadialGauge from './arc_gauge'
+import CanvasGauge from './canvas_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -30,12 +30,12 @@ class Dash extends React.Component {
   }
 
   gaugeTypeToComponent(props) {
-    let p = {...props, channel: this.channel}
-    switch (props.active_gauge) {
-      case "bar":
-        return <BarGauge {...p}/>;
-      case "arc":
-        return <ReactRadialGauge {...p}/>;
+    let p = {...props, channel: this.channel, type: props.active_gauge}
+    if (props.active_gauge === "bar") {
+      return <BarGauge {...p}/>;
+    }
+    else{
+      return <CanvasGauge {...p}/>;
     }
   }
 
@@ -54,11 +54,8 @@ class Dash extends React.Component {
           <div key="dummy" style={{display: "none"}} data-grid={{ w: 0, h: 0, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent({active_gauge: "bar"})}
           </div>
-          {/* <div key="dummy2" id="bla" data-grid={{ w: 1, h: 1, x: 0, y: 0 }}>
-          <ReactRadialGauge value={0} width={165} height={150}/>
-          </div> */}
         {this.state.active_pids.map((pid) => (
-          <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 1, x: 0, y: 0 }}>
+          <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 3, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent(pid)}
           </div>
         ))}
