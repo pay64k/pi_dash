@@ -39,6 +39,12 @@ class Dash extends React.Component {
     }
   }
 
+  gaugeStyle(active_gauge) {
+    if (active_gauge !== "bar"){
+      return {border: 0}
+    }
+  }
+
   render() {
     return (
       <ResponsiveReactGridLayout
@@ -55,7 +61,7 @@ class Dash extends React.Component {
             {this.gaugeTypeToComponent({active_gauge: "bar"})}
           </div>
         {this.state.active_pids.map((pid) => (
-          <div key={pid.obd_pid_name} data-grid={{ w: 3, h: 3, x: 0, y: 0 }}>
+          <div key={pid.obd_pid_name} style={this.gaugeStyle(pid.active_gauge)} data-grid={{ w: 3, h: 3, x: 0, y: 0 }}>
             {this.gaugeTypeToComponent(pid)}
           </div>
         ))}

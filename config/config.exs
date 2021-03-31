@@ -8,13 +8,13 @@ config :pi_dash,
   nudge_interval: 6000,
   extra_logging: System.get_env("EXTRA_LOGGING", "false") |> String.to_existing_atom(),
   app_supported_pids: [
-    %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100},
-    %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215},
-    %{hex: "0C", obd_pid_name: :speed, min_value: 0, max_value: 255},
-    %{hex: "0D", obd_pid_name: :rpm, min_value: 0, max_value: System.get_env("MAX_RPM", "6500") |> String.to_integer},
-    %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215},
-    %{hex: "11", obd_pid_name: :throttle_pos, min_value: 0, max_value: 100},
-    %{hex: "0E", obd_pid_name: :timing_advance, min_value: -64, max_value: 63.5}
+    %{hex: "04", obd_pid_name: :engine_load, min_value: 0, max_value: 100, units: "%"},
+    %{hex: "05", obd_pid_name: :coolant_temp, min_value: -40, max_value: 215, units: "°C"},
+    %{hex: "0C", obd_pid_name: :speed, min_value: 0, max_value: 255, units: "km/h"},
+    %{hex: "0D", obd_pid_name: :rpm, min_value: 0, max_value: System.get_env("MAX_RPM", "6500") |> String.to_integer, units: ""},
+    %{hex: "0F", obd_pid_name: :intake_temp, min_value: -40, max_value: 215, units: "°C"},
+    %{hex: "11", obd_pid_name: :throttle_pos, min_value: 0, max_value: 100, units: "%"},
+    %{hex: "0E", obd_pid_name: :timing_advance, min_value: -64, max_value: 63.5, units: "°"}
   ]
 
 # Configures the endpoint

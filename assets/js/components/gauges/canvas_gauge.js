@@ -1,6 +1,7 @@
 import React from "react"
 import { RadialGauge, LinearGauge } from "canvas-gauges"
 
+const font = "monospace"
 class CanvasGauge extends React.Component {
 
     constructor(props) {
@@ -10,11 +11,23 @@ class CanvasGauge extends React.Component {
             channel: props.channel,
             height: 50,
             width: 50,
+            majorTicks: majorTicks(this.props),
             maxValue: this.props.max_value,
             minValue: this.props.min_value,
             title: this.props.obd_pid_name,
             type: this.props.type,
-            fontTitle: "monospace"
+            fontTitle: font,
+            fontNumbers: font,
+            fontValue: font,
+            fontUnits: font,
+            valueDec: 0,
+            units: this.props.units,
+            barBeginCircle: 0,
+            borders: false,
+            borderRadius: 0,
+            barLength: 88,
+            highlights: [],
+            fontNumbersSize: 30
         }
     }
 
@@ -66,6 +79,27 @@ class CanvasGauge extends React.Component {
 
         )
     }
+}
+
+function majorTicks(props) {
+    let start = props.min_value
+    let stop = props.max_value
+    let step 
+
+    if(stop > 1000){
+        step = 1000
+    } else if(stop === 100){
+        step = 20
+    } else {
+        step = 50
+    }
+
+    var a = [start], b = start;
+    while (b < stop) {
+        a.push(b += step || 1);
+    }
+    // return (b > stop) ? a.slice(0,-1) : a;
+    return a;
 }
 
 export default CanvasGauge
