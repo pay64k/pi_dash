@@ -56,7 +56,6 @@ class App extends React.Component {
         <>
           <GlobalStyles />
           <Controller channel={this.channel} setTheme_cb={this.setTheme_cb} />
-          <div className="MuiLinearProgress-barColorPrimary MuiLinearProgress-colorPrimary"></div>
         </>
       </ThemeProvider>
     )

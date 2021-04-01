@@ -27,7 +27,8 @@ class CanvasGauge extends React.Component {
             borderRadius: 0,
             barLength: 88,
             highlights: [],
-            fontNumbersSize: 30
+            fontNumbersSize: 27,
+            theme: props.theme
         }
     }
 
@@ -40,11 +41,16 @@ class CanvasGauge extends React.Component {
                 value: message.value 
             }
             // console.log("state: ", this.state)
+            // console.log(this.container.style)
+            var a = document.getElementById('body')
+            var color = window.getComputedStyle(a).backgroundColor
+
             this.gauge.update(tempProp)
             this.setState({
                 value: message.value,
                 width: this.container.clientWidth,
-                height: this.container.clientHeight
+                height: this.container.clientHeight,
+                colorPlate: color
             })
         });
 
