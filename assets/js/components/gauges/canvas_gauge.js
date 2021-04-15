@@ -43,14 +43,19 @@ class CanvasGauge extends React.Component {
             // console.log("state: ", this.state)
             // console.log(this.container.style)
             var a = document.getElementById('body')
-            var color = window.getComputedStyle(a).backgroundColor
-
+            var colorPlate = this.computePlateColor(window.getComputedStyle(a).backgroundColor)
+            var textColor = window.getComputedStyle(a).color
+            console.log(window.getComputedStyle(a).backgroundColor)
             this.gauge.update(tempProp)
             this.setState({
                 value: message.value,
                 width: this.container.clientWidth,
                 height: this.container.clientHeight,
-                colorPlate: color
+                colorPlate: colorPlate,
+                colorUnits: textColor,
+                colorTitle: textColor,
+                colorNumbers: textColor,
+                colorStrokeTicks: textColor
             })
         });
 
@@ -59,6 +64,15 @@ class CanvasGauge extends React.Component {
         })
         let chosenGauge = this.gaugeType(this.state.type)
         this.gauge = new chosenGauge(options).draw()
+    }
+
+    computePlateColor(bodyColor) {
+        if(bodyColor == "rgb(226, 226, 226)"){
+            return "#ececec"
+        }
+        if(bodyColor == "rgb(54, 53, 55)"){
+            return "#252525"
+        }
     }
 
     gaugeType(type) {
