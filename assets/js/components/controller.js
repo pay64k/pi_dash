@@ -8,6 +8,7 @@ import GaugeSelection from "./controller/gauge_selection"
 import NightMode from "./controller/night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
+const version = getFromLS("app_version") || [];
 const gauges = ["bar", "radial", "line"]
 
 class Controller extends React.Component {
@@ -17,7 +18,7 @@ class Controller extends React.Component {
     this.state = {
       elm_status: "unknown",
       supported_pids: [],
-      active_pids: JSON.parse(JSON.stringify(active_pids)),
+      active_pids: this.checkVersion(),
       active_interval: 1000,
       active_gauge: gauges[0]
     };
@@ -56,6 +57,17 @@ class Controller extends React.Component {
   pushOnChannel(msg, body) {
     if (body == null) { body = {} }
     this.channel.push(msg, body)
+  }
+
+  checkVersion() {
+    if (readVersion() === app_version) {
+      return JSON.parse(JSON.stringify(active_pids))
+    }
+    else {
+      saveVersion(app_version)
+      saveToLS("active_pids", [])
+      return []
+    }
   }
 
   maybe_start_pid_worker(pid) {
@@ -173,6 +185,30 @@ function saveToLS(key, value) {
       })
     );
   }
+}
+
+function saveVersion(value) {
+  if (global.localStorage) {
+    global.localStorage.setItem(
+      "pi_dash_version",
+      JSON.stringify({
+        ["ver"]: value
+      })
+    );
+  }
+}
+
+function readVersion() {
+  let version = {}
+  if (global.localStorage) {
+    try {
+      version = JSON.parse(global.localStorage.getItem("pi_dash_version"));
+    } catch (e) {
+      console.log(e)
+      return null;
+    }
+  }
+  return version["ver"]
 }
 
 export default Controller

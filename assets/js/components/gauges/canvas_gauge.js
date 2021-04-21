@@ -40,12 +40,9 @@ class CanvasGauge extends React.Component {
                 height: this.state.height, 
                 value: message.value 
             }
-            // console.log("state: ", this.state)
-            // console.log(this.container.style)
             var a = document.getElementById('body')
             var colorPlate = this.computePlateColor(window.getComputedStyle(a).backgroundColor)
             var textColor = window.getComputedStyle(a).color
-            console.log(window.getComputedStyle(a).backgroundColor)
             this.gauge.update(tempProp)
             this.setState({
                 value: message.value,

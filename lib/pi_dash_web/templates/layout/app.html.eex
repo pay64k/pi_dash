@@ -7,6 +7,7 @@
     <title>PiDash · Phoenix Framework</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <script>var app_version = "<%= Application.spec(:pi_dash, :vsn) %>"</script>
   </head>
   <body id="body">
     <main role="main" class="container-fluid">
