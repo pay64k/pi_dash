@@ -199,7 +199,7 @@ function saveVersion(value) {
 }
 
 function readVersion() {
-  let version = {}
+  let version = null
   if (global.localStorage) {
     try {
       version = JSON.parse(global.localStorage.getItem("pi_dash_version"));
@@ -208,7 +208,10 @@ function readVersion() {
       return null;
     }
   }
-  return version["ver"]
+  if(version == null)
+    return null
+  else
+    return version["ver"]
 }
 
 export default Controller
