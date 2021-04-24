@@ -1,7 +1,7 @@
 import React from "react";
 
 import BarGauge from './bar_gauge'
-import CanvasGauge from './canvas_gauge'
+import RadialGauge from './radial_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -35,7 +35,7 @@ class Dash extends React.Component {
       return <BarGauge {...p}/>;
     }
     else{
-      return <CanvasGauge {...p}/>;
+      return <RadialGauge {...p}/>;
     }
   }
 
