@@ -1,0 +1,18 @@
+[info] Supported PIDs hex: ["01", "02", "04", "05", "0B", "0C", "0D", "0F", "10", "11", "1C", "1F", "20"]
+[info] Supported PIDs names: [:status, :freeze_dtc, :engine_load, :coolant_temp, :intake_pressure, :rpm,
+ :speed, :intake_temp, :maf, :throttle_pos, :obd_compliance, :run_time, :pids_b]
+[debug] Write to ELM: "0120", state: :get_supported_pids
+[debug] Got from ELM: ">7E8064120A003A001", state: :get_supported_pids
+[debug] :get_supported_pids {next}: {true, true}
+[info] Supported PIDs hex: ["21", "23", "2F", "30", "31", "33", "40"]
+[info] Supported PIDs names: [:distance_w_mil, :fuel_rail_pressure_direct, :fuel_level,
+ :warmups_since_dtc_clear, :distance_since_dtc_clear, :barometric_pressure,
+ :pids_c]
+[debug] Write to ELM: "0140", state: :get_supported_pids
+[debug] Got from ELM: ">7E80641404ED380D9", state: :get_supported_pids
+[debug] :get_supported_pids {next}: {true, false}
+[info] Supported PIDs hex: ["42", "45", "46", "47", "49", "4A", "4C", "4F", "50", "51", "59", "5A", "5C", "5D", "60"]
+[info] Supported PIDs names: [:control_module_voltage, :relative_throttle_pos, :ambiant_air_temp,
+ :throttle_pos_b, :accelerator_pos_d, :accelerator_pos_e, :throttle_actuator,
+ :unsupported, :max_maf, :fuel_type, :fuel_rail_pressure_abs,
+ :relative_accel_pos, :oil_temp, :fuel_inject_timing, :not_implemented]

@@ -25,7 +25,6 @@ class BarGauge extends React.Component {
 
     componentDidMount() {
         this.props.channel.on("update:" + this.props.obd_pid_name, (message) => {
-
             this.setState({ value: message.value, color: this.getColor(message.value) })
         });
     }

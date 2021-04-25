@@ -8,7 +8,7 @@ import GaugeSelection from "./controller/gauge_selection"
 import NightMode from "./controller/night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
-const gauges = ["bar"]
+const gauges = ["bar", "radial", "arc"]
 
 class Controller extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class Controller extends React.Component {
     this.state = {
       elm_status: "unknown",
       supported_pids: [],
-      active_pids: JSON.parse(JSON.stringify(active_pids)),
+      active_pids: this.checkVersion(),
       active_interval: 1000,
       active_gauge: gauges[0]
     };
@@ -56,6 +56,17 @@ class Controller extends React.Component {
   pushOnChannel(msg, body) {
     if (body == null) { body = {} }
     this.channel.push(msg, body)
+  }
+
+  checkVersion() {
+    if (readVersion() === app_version) {
+      return JSON.parse(JSON.stringify(active_pids))
+    }
+    else {
+      saveVersion(app_version)
+      saveToLS("active_pids", [])
+      return []
+    }
   }
 
   maybe_start_pid_worker(pid) {
@@ -109,6 +120,19 @@ class Controller extends React.Component {
     this.setState({ active_interval: new_interval });
   }
 
+  statusLight(state) {
+    if (state == "connect")
+      return "danger"
+    else if (state == "configuring")
+      return "warning"
+    else if (state == "get_supported_pids")
+      return "warning"
+    else if (state == "connected_configured")
+      return "success"
+    else 
+      return "secondary"
+  }
+
   render() {
     return (
       <div>
@@ -117,9 +141,6 @@ class Controller extends React.Component {
           <div className="container p-0">
             <div className="row row-30">
               <div className="col-sm">
-                <h6>{this.state.elm_status}</h6>
-              </div>
-              <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
                   <NightMode setTheme_cb={this.props.setTheme_cb} />
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
@@ -127,6 +148,7 @@ class Controller extends React.Component {
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
                     maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
+                  <Button variant={this.statusLight(this.state.elm_status)}>STS</Button>{' '}
                   <Button
                     onClick={() => this.clear_all_pids()}
                     variant="secondary">Clear</Button>{' '}
@@ -173,6 +195,33 @@ function saveToLS(key, value) {
       })
     );
   }
+}
+
+function saveVersion(value) {
+  if (global.localStorage) {
+    global.localStorage.setItem(
+      "pi_dash_version",
+      JSON.stringify({
+        ["ver"]: value
+      })
+    );
+  }
+}
+
+function readVersion() {
+  let version = null
+  if (global.localStorage) {
+    try {
+      version = JSON.parse(global.localStorage.getItem("pi_dash_version"));
+    } catch (e) {
+      console.log(e)
+      return null;
+    }
+  }
+  if (version == null)
+    return null
+  else
+    return version["ver"]
 }
 
 export default Controller

@@ -2,7 +2,8 @@
 
 # pi_dash - automotive (rally) dash written in Elixir and React that runs on Raspberry Pi
 
-![alt text](.github/readme/gui.png)
+![alt text](.github/readme/gui2.png)
+![alt text](.github/readme/gui3.png)
 
 pi_dash is an application that can replace your cars standard gauges with customizable dashboard where you can choose which reading you would like to see.
 
@@ -11,7 +12,7 @@ The reason this project came to life is that my amateur rally car was lacking a 
 In the beginning I only wanted to make a simple tachometer, but then decided to go full in and came up with this.
 
 ### **Note:**
-The project is still in development and was tested only on several cars. GUI would use some enhancements - but for now it's the simplest working solution.
+The project is still in development and was tested only on several cars. 
 #
 
 ## Features
