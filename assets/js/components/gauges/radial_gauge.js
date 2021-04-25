@@ -5,7 +5,6 @@ class RadialGauge extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log(props)
         this.state = {
             value: 0,
             channel: props.channel,
@@ -23,7 +22,8 @@ class RadialGauge extends React.Component {
             labelFontColor: this.textColor(),
             valueFontColor: this.textColor(),
             donut: this.isDonut(props.type),
-            donutStartAngle: 0
+            donutStartAngle: 90,
+            customSectors: this.customSectors()
         }
     }
 
@@ -72,7 +72,7 @@ class RadialGauge extends React.Component {
             return "#ececec"
         }
         if (bodyColor == "rgb(54, 53, 55)") {
-            return "#252525"
+            return "#5e5d5f"
         }
     }
 
@@ -82,10 +82,32 @@ class RadialGauge extends React.Component {
     }
 
     isDonut(type) {
-        if(type == "radial")
+        if (type == "radial")
             return true
         else
             return false
+    }
+
+    customSectors() {
+        return {
+            percents: true, // lo and hi values are in %
+            ranges: [{
+                color: "#4CA952",
+                lo: 0,
+                hi: 60
+            },
+            {
+                color: "#FFBA49",
+                lo: 61,
+                hi: 70
+            },
+            {
+                color: "#EF5B5B",
+                lo: 71,
+                hi: 100
+            }
+            ]
+        }
     }
 
     render() {

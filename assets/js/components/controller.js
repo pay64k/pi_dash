@@ -120,6 +120,19 @@ class Controller extends React.Component {
     this.setState({ active_interval: new_interval });
   }
 
+  statusLight(state) {
+    if (state == "connect")
+      return "danger"
+    else if (state == "configuring")
+      return "warning"
+    else if (state == "get_supported_pids")
+      return "warning"
+    else if (state == "connected_configured")
+      return "success"
+    else 
+      return "secondary"
+  }
+
   render() {
     return (
       <div>
@@ -128,9 +141,6 @@ class Controller extends React.Component {
           <div className="container p-0">
             <div className="row row-30">
               <div className="col-sm">
-                <h6>{this.state.elm_status}</h6>
-              </div>
-              <div className="col-sm">
                 <ButtonGroup aria-label="Buttons">
                   <NightMode setTheme_cb={this.props.setTheme_cb} />
                   <GaugeSelection gauges={gauges} update_active_gauge_cb={this.update_active_gauge_cb} />
@@ -138,6 +148,7 @@ class Controller extends React.Component {
                   <PidsDropdown
                     supported_pids={this.state.supported_pids}
                     maybe_start_pid_worker_cb={this.maybe_start_pid_worker_cb} />
+                  <Button variant={this.statusLight(this.state.elm_status)}>STS</Button>{' '}
                   <Button
                     onClick={() => this.clear_all_pids()}
                     variant="secondary">Clear</Button>{' '}
@@ -207,7 +218,7 @@ function readVersion() {
       return null;
     }
   }
-  if(version == null)
+  if (version == null)
     return null
   else
     return version["ver"]
