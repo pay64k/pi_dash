@@ -155,6 +155,9 @@ class Controller extends React.Component {
                   <Button
                     onClick={() => this.restart()}
                     variant="danger">Restart</Button>{' '}
+                  <Button
+                    onClick={() => this.maybe_start_pid_worker({obd_pid_name: "rpm"})}
+                    variant="secondary">Test</Button>{' '}
                 </ButtonGroup>
               </div>
               <div className="col-sm">

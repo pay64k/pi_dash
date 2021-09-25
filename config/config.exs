@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :pi_dash,
-  serial_port: "",
+  serial_port: "/dev/ttys001",
   supported_manufacturers: ["Prolific"],
   supported_serial_names: ["OBDII"],
   connect_timeout: 7000,
