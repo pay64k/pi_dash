@@ -24,7 +24,7 @@ defmodule Obd.DataTranslator do
 
     %{obd_pid_name: obd_pid_name, data: data_and_crc}
   end
-  "83 F1 7A 41 0D 7B B7"
+
   def handle_data(%{data: data, obd_pid_name: obd_pid_name}) do
     handle_data(obd_pid_name, data)
   end
