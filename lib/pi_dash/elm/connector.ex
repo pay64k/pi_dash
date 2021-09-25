@@ -19,9 +19,7 @@ defmodule Elm.Connector do
   require Logger
 
   @obd_pids_supported [
-    "01" <> PT.name_to_pid(:pids_a),
-    "01" <> PT.name_to_pid(:pids_b),
-    "01" <> PT.name_to_pid(:pids_c)
+    "01" <> PT.name_to_pid(:pids_a)
   ]
 
   def write_at_command(msg) do

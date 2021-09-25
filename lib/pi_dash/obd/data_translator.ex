@@ -7,9 +7,15 @@ defmodule Obd.DataTranslator do
 
   def decode_data(hex_string) do
     <<header::24, mode::8, pid::8, data_and_crc::binary>> = Base.decode16!(hex_string)
-    if Application.fetch_env!(:pi_dash, :extra_logging), do:
-      Logger.debug("decoded data for #{hex_string}:
-        header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{inspect(Base.encode16(<<mode::8>>))}, pid: #{inspect(Base.encode16(<<pid::8>>))}")
+
+    if Application.fetch_env!(:pi_dash, :extra_logging),
+      do:
+        Logger.debug(
+          "decoded data for #{hex_string}:
+        header: #{inspect(Base.encode16(<<header::24>>))}, mode: #{
+            inspect(Base.encode16(<<mode::8>>))
+          }, pid: #{inspect(Base.encode16(<<pid::8>>))}"
+        )
 
     obd_pid_name =
       <<pid::8>>
@@ -18,7 +24,7 @@ defmodule Obd.DataTranslator do
 
     %{obd_pid_name: obd_pid_name, data: data_and_crc}
   end
-
+  "83 F1 7A 41 0D 7B B7"
   def handle_data(%{data: data, obd_pid_name: obd_pid_name}) do
     handle_data(obd_pid_name, data)
   end
@@ -44,8 +50,8 @@ defmodule Obd.DataTranslator do
   def handle_data(:throttle_pos, <<a::8>>), do: 100 / 255 * a
   def handle_data(:throttle_pos, <<>>), do: 0
 
-  def handle_data(:timing_advance, <<a::8, _crc>>), do: a/2 - 64
-  def handle_data(:timing_advance, <<a::8>>), do: a/2 -64
+  def handle_data(:timing_advance, <<a::8, _crc>>), do: a / 2 - 64
+  def handle_data(:timing_advance, <<a::8>>), do: a / 2 - 64
 
   def handle_data(_obd_pid, _data), do: {:error, :unhandled}
 
