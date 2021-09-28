@@ -2,6 +2,7 @@ import React from "react";
 
 import BarGauge from './bar_gauge'
 import RadialGauge from './radial_gauge'
+import NumberGauge from './number_gauge'
 
 import { WidthProvider, Responsive } from "react-grid-layout";
 
@@ -33,6 +34,9 @@ class Dash extends React.Component {
     let p = {...props, channel: this.channel, type: props.active_gauge}
     if (props.active_gauge === "bar") {
       return <BarGauge {...p}/>;
+    }
+    else if(props.active_gauge === "number") {
+      return <NumberGauge {...p}/>;
     }
     else{
       return <RadialGauge {...p}/>;

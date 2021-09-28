@@ -8,7 +8,7 @@ import GaugeSelection from "./controller/gauge_selection"
 import NightMode from "./controller/night_mode"
 
 const active_pids = getFromLS("active_pids") || [];
-const gauges = ["bar", "radial", "arc"]
+const gauges = ["bar", "radial", "arc", "number"]
 
 class Controller extends React.Component {
   constructor(props) {
