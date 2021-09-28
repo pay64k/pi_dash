@@ -4,6 +4,7 @@
 
 ![alt text](.github/readme/gui2.png)
 ![alt text](.github/readme/gui3.png)
+![alt text](.github/readme/gui4.png)
 
 pi_dash is an application that can replace your cars standard gauges with customizable dashboard where you can choose which reading you would like to see.
 
