@@ -206,7 +206,7 @@ defmodule Elm.Connector do
             {:next_state, :get_supported_pids,
              %Data{data | last_sent_command: to_send, elm_queue: rest, tref: tref}}
 
-          {false, false} ->
+          {true, true} ->
             Process.cancel_timer(data.tref)
 
             Logger.warn("NO DATA for supported pids #{data.last_sent_command}")
